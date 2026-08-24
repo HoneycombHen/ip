@@ -1,4 +1,4 @@
-import java.sql.SQLOutput;
+import java.util.Scanner;
 
 public class Bob {
     public static void main(String[] args) {
@@ -14,8 +14,20 @@ public class Bob {
                 "What can I do for you?");
         System.out.println(hor_line);
 
-        System.out.println("Bye. Hope to see you again soon!");
-        System.out.println(hor_line);
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String command = scanner.nextLine();
+            System.out.println(hor_line);
+
+            if (command.equals("bye")) {
+                System.out.println("Bye. Hope to see you again soon!");
+                System.out.println(hor_line);
+                break;
+            }
+
+            System.out.println(command);
+            System.out.println(hor_line);
+        }
 
     }
 }
