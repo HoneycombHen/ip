@@ -1,26 +1,48 @@
+/**
+ * Represents a task that can be marked as done or undone.
+ */
 public class Task {
-    protected String description;
-    protected boolean isDone;
+    private final String description;
+    private boolean isDone;
 
     public Task(String description) {
         this.description = description;
         this.isDone = false;
     }
 
+    /**
+     * Returns the symbol used to show whether this task is complete.
+     *
+     * @return X for a completed task, or a blank space otherwise
+     */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
     }
 
+    /**
+     * Returns the task in the format used by the list command.
+     *
+     * @return the task's status and description
+     */
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
     }
 
+    /**
+     * Returns the task description for confirmation messages.
+     *
+     * @return the description of this task
+     */
+    public String getDescription() {
+        return description;
+    }
+
     public void setDone() {
-        isDone = true;
+        this.isDone = true;
     }
 
     public void setUndone() {
-        isDone = false;
+        this.isDone = false;
     }
 }
