@@ -22,6 +22,14 @@ Unless the user says otherwise, assume that you are assisting a student working 
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
 
+## Code update verification
+
+After every application code update:
+
+* Read `test/ui-test-plan.md` and update it when the change affects the UI behavior, commands, inputs, or expected output. Add or revise test cases before testing when needed.
+* Invoke the `test-ui` skill to run the documented command-line UI tests after the code update.
+* Do not silently rewrite expected outputs to make a failing test pass. If the test plan is incomplete or contradictory, report that before running the affected test.
+
 # Project-specific requirements
 
 ## Java version:

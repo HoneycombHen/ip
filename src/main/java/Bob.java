@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -11,26 +12,25 @@ public class Bob {
      * @param parts command words, such as ["mark", "1"]
      * @param taskCount number of tasks currently stored
      * @param commandName command being validated
-     * @return the zero-based task index, or -1 if the input is invalid
+     * @return the zero-based task index
+     * @throws BobException if the command does not contain a valid task number
      */
-    private static int getTaskIndex(String[] parts, int taskCount, String commandName) {
+    private static int getTaskIndex(String[] parts, int taskCount, String commandName)
+            throws BobException {
         if (parts.length != 2) {
-            System.out.println("Please use the format: " + commandName + " <task number>");
-            return -1;
+            throw new BobException("Please use the format: " + commandName + " <task number>.");
         }
 
         try {
             int taskNumber = Integer.parseInt(parts[1]);
 
             if (taskNumber < 1 || taskNumber > taskCount) {
-                System.out.println("That task number does not exist.");
-                return -1;
+                throw new BobException("That task number does not exist.");
             }
 
             return taskNumber - 1;
         } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid task number.");
-            return -1;
+            throw new BobException("Please enter a valid task number.");
         }
     }
 
@@ -39,38 +39,42 @@ public class Bob {
      * Dates and times are intentionally kept as strings for this level.
      *
      * @param input the trimmed user command
-     * @return a new task, or null if the command is invalid or unknown
+     * @return a new task
+     * @throws BobException if the command is invalid or unknown
      */
-    private static Task createTask(String input) {
-        if (input.startsWith("todo ")) {
-            String description = input.substring("todo ".length()).trim();
+    private static Task createTask(String input) throws BobException {
+        if (input.equals("todo") || input.startsWith("todo ")) {
+            String description = input.length() == "todo".length()
+                    ? ""
+                    : input.substring("todo ".length()).trim();
             if (description.isEmpty()) {
-                System.out.println("Error: A todo must have a description.");
-                return null;
+                throw new BobException("A todo must have a description.");
             }
             return new Todo(description);
         }
 
-        if (input.startsWith("deadline ")) {
-            String content = input.substring("deadline ".length()).trim();
+        if (input.equals("deadline") || input.startsWith("deadline ")) {
+            String content = input.length() == "deadline".length()
+                    ? ""
+                    : input.substring("deadline ".length()).trim();
             String[] parts = content.split("\\s+/by\\s+", 2);
 
             if (parts.length != 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                System.out.println("Error: Missing '/by' tag or deadline details.");
-                return null;
+                throw new BobException("A deadline needs a description and a '/by' detail.");
             }
 
             return new Deadline(parts[0].trim(), parts[1].trim());
         }
 
-        if (input.startsWith("event ")) {
-            String content = input.substring("event ".length()).trim();
+        if (input.equals("event") || input.startsWith("event ")) {
+            String content = input.length() == "event".length()
+                    ? ""
+                    : input.substring("event ".length()).trim();
             int fromIndex = content.indexOf("/from");
             int toIndex = fromIndex < 0 ? -1 : content.indexOf("/to", fromIndex + "/from".length());
 
             if (fromIndex <= 0 || toIndex <= fromIndex + "/from".length()) {
-                System.out.println("Error: Please provide valid /from and /to tags in order.");
-                return null;
+                throw new BobException("An event needs a description followed by '/from' and '/to' details.");
             }
 
             String description = content.substring(0, fromIndex).trim();
@@ -78,15 +82,13 @@ public class Bob {
             String to = content.substring(toIndex + "/to".length()).trim();
 
             if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                System.out.println("Error: Event description, /from, and /to details are required.");
-                return null;
+                throw new BobException("Event description, '/from', and '/to' details are required.");
             }
 
             return new Event(description, from, to);
         }
 
-        System.out.println("Please use a proper command!");
-        return null;
+        throw new BobException("I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.");
     }
 
     /**
@@ -116,8 +118,7 @@ public class Bob {
                 "What can I do for you?");
         System.out.println(horizontalLine);
 
-        Task[] taskList = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> taskList = new ArrayList<>();
 
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
@@ -131,8 +132,8 @@ public class Bob {
 
             else if (input.equals("list")) {
                 System.out.println("Here are the tasks in your list:\n");
-                for (int j = 0; j < taskCount; j++) {
-                    Task task = taskList[j];
+                for (int j = 0; j < taskList.size(); j++) {
+                    Task task = taskList.get(j);
                     System.out.printf("%d.%s%n", (j + 1), task);
                 }
                 System.out.println(horizontalLine);
@@ -140,13 +141,15 @@ public class Bob {
 
             else if (input.equals("mark") || input.startsWith("mark ")) {
                 String[] parts = input.trim().split("\\s+");
-                int index = getTaskIndex(parts, taskCount, "mark");
-
-                if (index == -1) {
+                int index;
+                try {
+                    index = getTaskIndex(parts, taskList.size(), "mark");
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
                     continue;
                 }
 
-                Task task = taskList[index];
+                Task task = taskList.get(index);
                 task.setDone();
 
                 System.out.println("Nice! I've marked this task as done:\n"
@@ -156,36 +159,64 @@ public class Bob {
 
             else if (input.equals("unmark") || input.startsWith("unmark ")) {
                 String[] parts = input.split("\\s+");
-                int index = getTaskIndex(parts, taskCount, "unmark");
-
-                if (index == -1) {
+                int index;
+                try {
+                    index = getTaskIndex(parts, taskList.size(), "unmark");
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
                     continue;
                 }
 
-                Task task = taskList[index];
+                Task task = taskList.get(index);
                 System.out.println("OK, I've marked this task as not done yet:\n" +
                         "  [ ] " + task.getDescription());
                 task.setUndone();
                 System.out.println(horizontalLine);
             }
 
+            else if (input.equals("delete") || input.startsWith("delete ")) {
+                String[] parts = input.split("\\s+");
+                int index;
+                try {
+                    index = getTaskIndex(parts, taskList.size(), "delete");
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
+                    continue;
+                }
+
+                Task removedTask = taskList.remove(index);
+
+                System.out.println("Noted. I've removed this task:\n"
+                        + "    " + removedTask);
+                System.out.printf("Now you have %d tasks in the list.%n", taskList.size());
+                System.out.println(horizontalLine);
+            }
+
             else {
-                Task newTask = createTask(input);
+                Task newTask;
+                try {
+                    newTask = createTask(input);
 
-                if (newTask == null) {
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
                     continue;
                 }
 
-                if (taskCount >= taskList.length) {
-                    System.out.println("Your task list is full.");
-                    continue;
-                }
-
-                taskList[taskCount] = newTask;
-                taskCount++;
-                printAddedTask(newTask, taskCount, horizontalLine);
+                taskList.add(newTask);
+                printAddedTask(newTask, taskList.size(), horizontalLine);
             }
         }
+    }
+
+    /**
+     * Displays an input error without terminating the command loop.
+     *
+     * @param exception input error to explain
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printError(BobException exception, String horizontalLine) {
+        System.out.println("Oops! " + exception.getMessage());
+        System.out.println(horizontalLine);
     }
 
 }
