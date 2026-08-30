@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -108,7 +109,7 @@ public class Bob {
         System.out.println(horizontalLine);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String banner = " ____        _     \n"
                 + "| __ )  ___ | |__  \n"
                 + "|  _ \\ / _ \\| '_ \\ \n"
@@ -149,6 +150,7 @@ public class Bob {
 
                 Task task = taskList.get(index);
                 task.setDone();
+                Storage.saveTasks(taskList);
 
                 System.out.println("Nice! I've marked this task as done:\n" + "  [X] " + task.getDescription());
                 System.out.println(horizontalLine);
@@ -165,6 +167,7 @@ public class Bob {
                 Task task = taskList.get(index);
                 System.out.println("OK, I've marked this task as not done yet:\n" + "  [ ] " + task.getDescription());
                 task.setUndone();
+                Storage.saveTasks(taskList);
                 System.out.println(horizontalLine);
             } else if (input.equals("delete") || input.startsWith("delete ")) {
                 String[] parts = input.split("\\s+");
@@ -177,6 +180,7 @@ public class Bob {
                 }
 
                 Task removedTask = taskList.remove(index);
+                Storage.saveTasks(taskList);
 
                 System.out.println("Noted. I've removed this task:\n" + "    " + removedTask);
                 System.out.printf("Now you have %d tasks in the list.%n", taskList.size());
@@ -192,6 +196,7 @@ public class Bob {
                 }
 
                 taskList.add(newTask);
+                Storage.saveTasks(taskList);
                 printAddedTask(newTask, taskList.size(), horizontalLine);
             }
         }
