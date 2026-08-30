@@ -121,7 +121,7 @@ public class Bob {
         System.out.println("Hello! I'm Bob.\n" + "What can I do for you?");
         System.out.println(horizontalLine);
 
-        ArrayList<Task> taskList = new ArrayList<>();
+        ArrayList<Task> taskList = new ArrayList<>(Storage.loadTasks());
 
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
