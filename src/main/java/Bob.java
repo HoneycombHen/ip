@@ -15,8 +15,7 @@ public class Bob {
      * @return the zero-based task index
      * @throws BobException if the command does not contain a valid task number
      */
-    private static int getTaskIndex(String[] parts, int taskCount, String commandName)
-            throws BobException {
+    private static int getTaskIndex(String[] parts, int taskCount, String commandName) throws BobException {
         if (parts.length != 2) {
             throw new BobException("Please use the format: " + commandName + " <task number>.");
         }
@@ -59,7 +58,9 @@ public class Bob {
                     : input.substring("deadline ".length()).trim();
             String[] parts = content.split("\\s+/by\\s+", 2);
 
-            if (parts.length != 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+            if (parts.length != 2
+                    || parts[0].trim().isEmpty()
+                    || parts[1].trim().isEmpty()) {
                 throw new BobException("A deadline needs a description and a '/by' detail.");
             }
 
@@ -78,7 +79,8 @@ public class Bob {
             }
 
             String description = content.substring(0, fromIndex).trim();
-            String from = content.substring(fromIndex + "/from".length(), toIndex).trim();
+            String from =
+                    content.substring(fromIndex + "/from".length(), toIndex).trim();
             String to = content.substring(toIndex + "/to".length()).trim();
 
             if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
@@ -88,7 +90,8 @@ public class Bob {
             return new Event(description, from, to);
         }
 
-        throw new BobException("I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+        throw new BobException(
+                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.");
     }
 
     /**
@@ -114,8 +117,7 @@ public class Bob {
         String horizontalLine = "____________________________________________________________";
         System.out.println(horizontalLine);
         System.out.println(banner);
-        System.out.println("Hello! I'm Bob.\n" +
-                "What can I do for you?");
+        System.out.println("Hello! I'm Bob.\n" + "What can I do for you?");
         System.out.println(horizontalLine);
 
         ArrayList<Task> taskList = new ArrayList<>();
@@ -128,18 +130,14 @@ public class Bob {
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(horizontalLine);
                 break;
-            }
-
-            else if (input.equals("list")) {
+            } else if (input.equals("list")) {
                 System.out.println("Here are the tasks in your list:\n");
                 for (int j = 0; j < taskList.size(); j++) {
                     Task task = taskList.get(j);
                     System.out.printf("%d.%s%n", (j + 1), task);
                 }
                 System.out.println(horizontalLine);
-            }
-
-            else if (input.equals("mark") || input.startsWith("mark ")) {
+            } else if (input.equals("mark") || input.startsWith("mark ")) {
                 String[] parts = input.trim().split("\\s+");
                 int index;
                 try {
@@ -152,12 +150,9 @@ public class Bob {
                 Task task = taskList.get(index);
                 task.setDone();
 
-                System.out.println("Nice! I've marked this task as done:\n"
-                        + "  [X] " + task.getDescription());
+                System.out.println("Nice! I've marked this task as done:\n" + "  [X] " + task.getDescription());
                 System.out.println(horizontalLine);
-            }
-
-            else if (input.equals("unmark") || input.startsWith("unmark ")) {
+            } else if (input.equals("unmark") || input.startsWith("unmark ")) {
                 String[] parts = input.split("\\s+");
                 int index;
                 try {
@@ -168,13 +163,10 @@ public class Bob {
                 }
 
                 Task task = taskList.get(index);
-                System.out.println("OK, I've marked this task as not done yet:\n" +
-                        "  [ ] " + task.getDescription());
+                System.out.println("OK, I've marked this task as not done yet:\n" + "  [ ] " + task.getDescription());
                 task.setUndone();
                 System.out.println(horizontalLine);
-            }
-
-            else if (input.equals("delete") || input.startsWith("delete ")) {
+            } else if (input.equals("delete") || input.startsWith("delete ")) {
                 String[] parts = input.split("\\s+");
                 int index;
                 try {
@@ -186,13 +178,10 @@ public class Bob {
 
                 Task removedTask = taskList.remove(index);
 
-                System.out.println("Noted. I've removed this task:\n"
-                        + "    " + removedTask);
+                System.out.println("Noted. I've removed this task:\n" + "    " + removedTask);
                 System.out.printf("Now you have %d tasks in the list.%n", taskList.size());
                 System.out.println(horizontalLine);
-            }
-
-            else {
+            } else {
                 Task newTask;
                 try {
                     newTask = createTask(input);
@@ -218,5 +207,4 @@ public class Bob {
         System.out.println("Oops! " + exception.getMessage());
         System.out.println(horizontalLine);
     }
-
 }

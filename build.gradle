@@ -1,0 +1,45 @@
+plugins {
+    id 'application'
+    id 'com.diffplug.spotless' version '8.10.0'
+}
+
+group = 'student.project'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+application {
+    mainClass = 'Bob'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target 'src/**/*.java'
+        importOrder('java', 'javax', 'org', 'com', '')
+        removeUnusedImports()
+        forbidWildcardImports()
+        palantirJavaFormat()
+        formatAnnotations()
+    }
+
+    format('markdown') {
+        target '**/*.md'
+        targetExclude 'build/**', '.gradle/**', 'test/ui-test-plan.md'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    format('gradle') {
+        target '*.gradle'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
