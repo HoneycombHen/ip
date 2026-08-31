@@ -43,7 +43,7 @@ What can I do for you?
 ____________________________________________________________
 Oops! A todo must have a description.
 ____________________________________________________________
-Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, or bye.
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, or bye.
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -704,6 +704,109 @@ ____________________________________________________________
 Oops! Please enter a valid number of days.
 ____________________________________________________________
 Oops! Please enter a non-negative number of days.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-016: List tasks on a date
+
+**Aim:** Verify that `on <date>` includes deadlines on the date and events spanning the date, while excluding unrelated tasks.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+deadline submit annual report /by 9999-12-31
+event multi-day meeting /from 9999-12-29 /to 9999-12-30
+event other meeting /from 9999-12-31 /to 9999-12-31
+on 9999-12-30
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] multi-day meeting (from: Wed, Dec 29 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] other meeting (from: Fri, Dec 31 9999 to: Fri, Dec 31 9999)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Here are the tasks on Thu, Dec 30 9999:
+
+1.[E][ ] multi-day meeting (from: Wed, Dec 29 9999 to: Thu, Dec 30 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-017: Validate on date arguments
+
+**Aim:** Verify that missing, invalid, and date-time query arguments are reported without terminating Bob.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+on
+on not-a-date
+on 9999-12-30T09:00
+todo continue working
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: on <date>.
+____________________________________________________________
+Oops! Please enter a valid date in the format: yyyy-MM-dd.
+____________________________________________________________
+Oops! Please enter a valid date in the format: yyyy-MM-dd.
 ____________________________________________________________
 Got it. I've added this task:
 
@@ -3026,6 +3129,123 @@ ____________________________________________________________
 **Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
 
 **Overall result:** PASS — all fifteen documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-08-31 17:30:00 +08:00
+
+**Plan revision:** Increment 4 `on <date>` command with date filtering, event-range matching, and argument validation.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case ran from a fresh isolated directory under `_temp/ui-session-20260831-on-final`, containing a copy of `build/classes/java/main`. UI-016 used distant fixture dates so its date-range check was independent of the current date.
+
+**Build command:** `gradlew.bat clean check` — passed with no compiler or test failures.
+
+#### UI-001 to UI-015
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:** The inputs documented for UI-001 through UI-015, in order.
+
+**Actual output:** Each case matched its expected output and the complete actual outputs are recorded in the preceding test sessions.
+
+**Result:** PASS — UI-001 through UI-015 all passed with exit code 0, empty stderr, and exact output after the documented trailing-space normalization.
+
+#### UI-016
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline submit annual report /by 9999-12-31
+event multi-day meeting /from 9999-12-29 /to 9999-12-30
+event other meeting /from 9999-12-31 /to 9999-12-31
+on 9999-12-30
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] multi-day meeting (from: Wed, Dec 29 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] other meeting (from: Fri, Dec 31 9999 to: Fri, Dec 31 9999)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Here are the tasks on Thu, Dec 30 9999:
+
+1.[E][ ] multi-day meeting (from: Wed, Dec 29 9999 to: Thu, Dec 30 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-017
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+on
+on not-a-date
+on 9999-12-30T09:00
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: on <date>.
+____________________________________________________________
+Oops! Please enter a valid date in the format: yyyy-MM-dd.
+____________________________________________________________
+Oops! Please enter a valid date in the format: yyyy-MM-dd.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all seventeen documented cases passed; testing stopped after the final case as required.
 
 ### Test session: 2026-08-31 16:30:00 +08:00
 

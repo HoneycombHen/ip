@@ -104,7 +104,7 @@ public class Bob {
         }
 
         throw new BobException(
-                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, or bye.");
+                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, or bye.");
     }
 
     /**
@@ -149,6 +149,32 @@ public class Bob {
     }
 
     /**
+     * Parses the date supplied to an on command.
+     *
+     * @param input the trimmed on command
+     * @return the requested date
+     * @throws BobException if the command does not contain a valid date
+     */
+    private static LocalDate getOnDate(String input) throws BobException {
+        String dateInput = input.length() <= "on".length()
+                ? ""
+                : input.substring("on".length()).trim();
+        if (dateInput.isEmpty()) {
+            throw new BobException("Please use the format: on <date>.");
+        }
+
+        try {
+            Temporal temporal = DateTimeParser.parse(dateInput);
+            if (temporal instanceof LocalDate date) {
+                return date;
+            }
+        } catch (DateTimeParseException e) {
+            // Report the invalid date using Bob's normal input-error flow.
+        }
+        throw new BobException("Please enter a valid date in the format: yyyy-MM-dd.");
+    }
+
+    /**
      * Prints tasks whose relevant date falls within the upcoming date range.
      *
      * @param taskList tasks to search
@@ -168,6 +194,58 @@ public class Bob {
             System.out.printf("%d.%s%n", j + 1, upcomingTasks.get(j));
         }
         System.out.println(horizontalLine);
+    }
+
+    /**
+     * Prints deadlines and events scheduled on a date.
+     *
+     * @param taskList tasks to search
+     * @param date date to search for
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printTasksOnDate(ArrayList<Task> taskList, LocalDate date, String horizontalLine) {
+        ArrayList<Task> matchingTasks = taskList.stream()
+                .filter(task -> isOnDate(task, date))
+                .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        System.out.printf("Here are the tasks on %s:%n%n", DateTimeParser.format(date));
+        for (int j = 0; j < matchingTasks.size(); j++) {
+            System.out.printf("%d.%s%n", j + 1, matchingTasks.get(j));
+        }
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Checks whether a deadline or event is scheduled on a date.
+     *
+     * @param task task to inspect
+     * @param date date to check
+     * @return true if the task occurs on the date
+     */
+    private static boolean isOnDate(Task task, LocalDate date) {
+        if (task instanceof Deadline) {
+            return getTaskDateTime(task).toLocalDate().equals(date);
+        }
+        if (task instanceof Event event) {
+            LocalDate fromDate = getTaskDateTime(event).toLocalDate();
+            LocalDate toDate = getDateTime(event.getTo()).toLocalDate();
+            return !date.isBefore(fromDate) && !date.isAfter(toDate);
+        }
+        return false;
+    }
+
+    /**
+     * Converts a stored temporal value to a local date-time for comparisons.
+     *
+     * @param temporal date or local date-time to convert
+     * @return local date-time representation
+     */
+    private static LocalDateTime getDateTime(Temporal temporal) {
+        if (temporal instanceof LocalDateTime dateTime) {
+            return dateTime;
+        }
+        return ((LocalDate) temporal).atStartOfDay();
     }
 
     /**
@@ -240,6 +318,13 @@ public class Bob {
                 try {
                     int days = getUpcomingDays(input);
                     printUpcomingTasks(taskList, days, horizontalLine);
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
+                }
+            } else if (input.equals("on") || input.startsWith("on ")) {
+                try {
+                    LocalDate date = getOnDate(input);
+                    printTasksOnDate(taskList, date, horizontalLine);
                 } catch (BobException e) {
                     printError(e, horizontalLine);
                 }
