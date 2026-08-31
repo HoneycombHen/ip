@@ -103,8 +103,8 @@ java -cp build/classes/java/main Bob
 **Inputs:**
 ```text
 todo buy milk
-deadline submit report /by Friday
-event meeting /from Monday /to Tuesday
+deadline submit report /by 2019-10-15
+event meeting /from 2019-10-16 /to 2019-10-17
 mark 4
 mark 9
 list
@@ -130,12 +130,12 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 Got it. I've added this task:
 
-[D][ ] submit report (by: Friday)
+[D][ ] submit report (by: Tue, Oct 15 2019)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 Got it. I've added this task:
 
-[E][ ] meeting (from: Monday to: Tuesday)
+[E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 Oops! That task number does not exist.
@@ -145,8 +145,8 @@ ____________________________________________________________
 Here are the tasks in your list:
 
 1.[T][ ] buy milk
-2.[D][ ] submit report (by: Friday)
-3.[E][ ] meeting (from: Monday to: Tuesday)
+2.[D][ ] submit report (by: Tue, Oct 15 2019)
+3.[E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -257,8 +257,8 @@ java -cp build/classes/java/main Bob
 **Inputs:**
 ```text
 todo write report
-deadline submit report /by Friday
-event team sync /from Monday /to Tuesday
+deadline submit report /by 2019-10-15
+event team sync /from 2019-10-16 /to 2019-10-17
 mark 1
 unmark 1
 delete 2
@@ -285,12 +285,12 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 Got it. I've added this task:
 
-[D][ ] submit report (by: Friday)
+[D][ ] submit report (by: Tue, Oct 15 2019)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 Got it. I've added this task:
 
-[E][ ] team sync (from: Monday to: Tuesday)
+[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 Nice! I've marked this task as done:
@@ -300,13 +300,13 @@ OK, I've marked this task as not done yet:
   [ ] write report
 ____________________________________________________________
 Noted. I've removed this task:
-    [D][ ] submit report (by: Friday)
+    [D][ ] submit report (by: Tue, Oct 15 2019)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 Here are the tasks in your list:
 
 1.[T][ ] write report
-2.[E][ ] team sync (from: Monday to: Tuesday)
+2.[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -315,7 +315,7 @@ ____________________________________________________________
 **Expected saved file (`data/Bob.txt`):**
 ```text
 [T][ ] write report
-[E][ ] team sync (from: Monday to: Tuesday)
+[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 ```
 
 ### UI-007: Load saved tasks at startup
@@ -325,8 +325,8 @@ ____________________________________________________________
 **Fixture before running:** Replace `data/Bob.txt` with:
 ```text
 [T][X] buy milk
-[D][ ] submit report (by: Friday)
-[E][X] team sync (from: Monday to: Tuesday)
+[D][ ] submit report (by: Tue, Oct 15 2019)
+[E][X] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 ```
 
 **Command:**
@@ -355,8 +355,8 @@ ____________________________________________________________
 Here are the tasks in your list:
 
 1.[T][X] buy milk
-2.[D][ ] submit report (by: Friday)
-3.[E][X] team sync (from: Monday to: Tuesday)
+2.[D][ ] submit report (by: Tue, Oct 15 2019)
+3.[E][X] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -482,6 +482,54 @@ ____________________________________________________________
 ```
 
 **Fixture cleanup:** Remove the `data/Bob.txt` directory and restore an empty `data/Bob.txt` file.
+
+### UI-011: Parse and format date-time details
+
+**Aim:** Verify that deadline and event date-time details are stored and displayed with a readable day and month format, while accepting both ISO separators.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+deadline submit report /by 2019-10-15 18:00
+event project meeting /from 2019-10-16T09:30 /to 2019-10-16T10:45
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019 18:00)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] project meeting (from: Wed, Oct 16 2019 09:30 to: Wed, Oct 16 2019 10:45)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[D][ ] submit report (by: Tue, Oct 15 2019 18:00)
+2.[E][ ] project meeting (from: Wed, Oct 16 2019 09:30 to: Wed, Oct 16 2019 10:45)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
 
 ## Test session
 
@@ -2106,3 +2154,478 @@ ____________________________________________________________
 **Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
 
 **Overall result:** PASS — all ten documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-08-31 14:00:00 +08:00
+
+**Plan revision:** Level 8 increment 1 date and time parsing, storage, and display formatting.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case ran from a fresh isolated directory under `_temp/ui-session-20260831-level8-increment1-final`, containing a copy of `build/classes/java/main`. Date fixtures were updated to use ISO dates and the new formatted representation.
+
+**Build command:** `gradlew.bat clean check` — passed with no compiler or test failures.
+
+#### UI-001
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo
+blah
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A todo must have a description.
+____________________________________________________________
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-002
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline project
+event meeting
+mark
+unmark nope
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A deadline needs a description and a '/by' detail.
+____________________________________________________________
+Oops! An event needs a description followed by '/from' and '/to' details.
+____________________________________________________________
+Oops! Please use the format: mark <task number>.
+____________________________________________________________
+Oops! Please enter a valid task number.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-003
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo buy milk
+deadline submit report /by 2019-10-15
+event meeting /from 2019-10-16 /to 2019-10-17
+mark 4
+mark 9
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] buy milk
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] buy milk
+2.[D][ ] submit report (by: Tue, Oct 15 2019)
+3.[E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-004
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo read book
+todo return book
+delete 1
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] return book
+Now you have 2 tasks in the list.
+____________________________________________________________
+Noted. I've removed this task:
+    [T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] return book
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-005
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+delete
+delete nope
+delete 1
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: delete <task number>.
+____________________________________________________________
+Oops! Please enter a valid task number.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-006
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo write report
+deadline submit report /by 2019-10-15
+event team sync /from 2019-10-16 /to 2019-10-17
+mark 1
+unmark 1
+delete 2
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] write report
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] write report
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [ ] write report
+____________________________________________________________
+Noted. I've removed this task:
+    [D][ ] submit report (by: Tue, Oct 15 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] write report
+2.[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Expected saved file:**
+```text
+[T][ ] write report
+[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact stdout and saved-file match after the documented trailing-space normalization.
+
+#### UI-007
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][X] buy milk
+2.[D][ ] submit report (by: Tue, Oct 15 2019)
+3.[E][X] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-008
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-009
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-010
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo test save failure
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Oops! I couldn't save the task list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] test save failure
+Now you have 1 tasks in the list.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-011
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline submit report /by 2019-10-15 18:00
+event project meeting /from 2019-10-16T09:30 /to 2019-10-16T10:45
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019 18:00)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] project meeting (from: Wed, Oct 16 2019 09:30 to: Wed, Oct 16 2019 10:45)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[D][ ] submit report (by: Tue, Oct 15 2019 18:00)
+2.[E][ ] project meeting (from: Wed, Oct 16 2019 09:30 to: Wed, Oct 16 2019 10:45)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all eleven documented cases passed; testing stopped after the final case as required.

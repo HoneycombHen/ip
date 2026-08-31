@@ -35,7 +35,7 @@ public class Bob {
 
     /**
      * Creates a task from a todo, deadline, or event command.
-     * Dates and times are intentionally kept as strings for this level.
+     * Date and time details are parsed by the deadline and event task classes.
      *
      * @param input the trimmed user command
      * @return a new task
