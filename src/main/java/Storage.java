@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,19 @@ public class Storage {
      * @return tasks represented by the data file
      * @throws IOException if the data file cannot be read
      */
-    public static List<Task> loadTasks() throws IOException {
-        List<String> taskLines = Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8);
-        List<Task> tasks = new ArrayList<>();
-        for (String taskLine : taskLines) {
-            tasks.add(parseTask(taskLine));
+    public static List<Task> loadTasks() throws StorageException {
+        try {
+            List<String> taskLines = Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8);
+            List<Task> tasks = new ArrayList<>();
+            for (String taskLine : taskLines) {
+                tasks.add(parseTask(taskLine));
+            }
+            return tasks;
+        } catch (NoSuchFileException e) {
+            return new ArrayList<>();
+        } catch (IOException | RuntimeException e) {
+            throw new StorageException("Could not load tasks from " + DATA_FILE + ".", e);
         }
-        return tasks;
     }
 
     /**
@@ -33,10 +40,14 @@ public class Storage {
      * @param tasks tasks to save
      * @throws IOException if the data directory or file cannot be written
      */
-    public static void saveTasks(List<Task> tasks) throws IOException {
-        Files.createDirectories(DATA_FILE.getParent());
-        List<String> taskLines = tasks.stream().map(Task::toString).collect(Collectors.toList());
-        Files.write(DATA_FILE, taskLines, StandardCharsets.UTF_8);
+    public static void saveTasks(List<Task> tasks) throws StorageException {
+        try {
+            Files.createDirectories(DATA_FILE.getParent());
+            List<String> taskLines = tasks.stream().map(Task::toString).collect(Collectors.toList());
+            Files.write(DATA_FILE, taskLines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new StorageException("Could not save tasks to " + DATA_FILE + ".", e);
+        }
     }
 
     /**

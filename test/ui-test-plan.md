@@ -4,11 +4,11 @@ This file is the source of truth for the `test-ui` project skill. Keep test case
 
 ## Run instructions
 
-- Working directory: project root
+- Working directory: project root for the build; use a fresh isolated directory under `_temp` for each UI test session so existing runtime data is not overwritten. Copy `build/classes/java/main` into that directory's `build/classes/java/main` before running the documented command.
 - Prerequisites: Java 25 (`java --version` and `javac --version`)
 - Build command: `gradlew.bat classes`
 - Run command: `java -cp build/classes/java/main Bob`
-- Test fixture setup: before each test case, create an empty UTF-8 `data/Bob.txt` file unless the test case specifies its own contents. From PowerShell, run `New-Item -ItemType Directory -Force data | Out-Null` followed by `[System.IO.File]::WriteAllText((Join-Path (Get-Location) 'data/Bob.txt'), '')`. Missing-file handling is intentionally not covered yet.
+- Test fixture setup: before each test case, create an empty UTF-8 `data/Bob.txt` file in the isolated working directory unless the test case specifies its own contents. From PowerShell, run `New-Item -ItemType Directory -Force data | Out-Null` followed by `[System.IO.File]::WriteAllText((Join-Path (Get-Location) 'data/Bob.txt'), '')`. UI-008, UI-009, and UI-010 specify their own error fixtures.
 - Output comparison: compare stdout after removing trailing spaces from each line; line content and exit status must otherwise match exactly, and stderr must be empty. This normalization keeps terminal-only padding from being treated as a Markdown trailing-space violation.
 
 ## Test cases
@@ -345,9 +345,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -361,6 +361,127 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+### UI-008: Start without a data file
+
+**Aim:** Verify that Bob starts with an empty task list when `data/Bob.txt` does not exist.
+
+**Fixture before running:** Remove `data/Bob.txt`.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-009: Handle malformed saved data
+
+**Aim:** Verify that Bob reports malformed saved data and continues with an empty task list.
+
+**Fixture before running:** Replace `data/Bob.txt` with:
+```text
+not a valid task line
+```
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-010: Handle a save failure
+
+**Aim:** Verify that Bob reports a task-save failure and continues running when `data/Bob.txt` is a directory.
+
+**Fixture before running:** Replace `data/Bob.txt` with a directory named `Bob.txt`.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+todo test save failure
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Oops! I couldn't save the task list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] test save failure
+Now you have 1 tasks in the list.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Fixture cleanup:** Remove the `data/Bob.txt` directory and restore an empty `data/Bob.txt` file.
 
 ## Test session
 
@@ -1263,9 +1384,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1298,9 +1419,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1339,9 +1460,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1395,9 +1516,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1443,9 +1564,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1483,9 +1604,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1541,9 +1662,9 @@ bye
 ____________________________________________________________
  ____        _
 | __ )  ___ | |__
-|  _ \\ / _ \\| '_ \\
+|  _ \ / _ \| '_ \
 | |_) | (_) | |_) |
-|____/ \\___/|_.__/
+|____/ \___/|_.__/
 
 Hello! I'm Bob.
 What can I do for you?
@@ -1561,3 +1682,427 @@ ____________________________________________________________
 **Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization; all three task types and completion states were loaded correctly.
 
 **Overall result:** PASS — all seven documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-08-31 12:12:55 +08:00
+
+**Plan revision:** Increment 3 storage error handling and UI-008 through UI-010 error-case coverage.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case then ran from a fresh isolated directory under `_temp`, containing a copy of `build/classes/java/main`, so the repository's existing `data/Bob.txt` was not overwritten.
+
+**Build command:** `gradlew.bat classes` — passed with no compiler errors.
+
+#### UI-001
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo
+blah
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A todo must have a description.
+____________________________________________________________
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-002
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline project
+event meeting
+mark
+unmark nope
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A deadline needs a description and a '/by' detail.
+____________________________________________________________
+Oops! An event needs a description followed by '/from' and '/to' details.
+____________________________________________________________
+Oops! Please use the format: mark <task number>.
+____________________________________________________________
+Oops! Please enter a valid task number.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-003
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo buy milk
+deadline submit report /by Friday
+event meeting /from Monday /to Tuesday
+mark 4
+mark 9
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] buy milk
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Friday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] meeting (from: Monday to: Tuesday)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] buy milk
+2.[D][ ] submit report (by: Friday)
+3.[E][ ] meeting (from: Monday to: Tuesday)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-004
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo read book
+todo return book
+delete 1
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] return book
+Now you have 2 tasks in the list.
+____________________________________________________________
+Noted. I've removed this task:
+    [T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] return book
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-005
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+delete
+delete nope
+delete 1
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: delete <task number>.
+____________________________________________________________
+Oops! Please enter a valid task number.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-006
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo write report
+deadline submit report /by Friday
+event team sync /from Monday /to Tuesday
+mark 1
+unmark 1
+delete 2
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] write report
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Friday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] team sync (from: Monday to: Tuesday)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] write report
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [ ] write report
+____________________________________________________________
+Noted. I've removed this task:
+    [D][ ] submit report (by: Friday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] write report
+2.[E][ ] team sync (from: Monday to: Tuesday)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-007
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][X] buy milk
+2.[D][ ] submit report (by: Friday)
+3.[E][X] team sync (from: Monday to: Tuesday)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-008
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-009
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-010
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+todo test save failure
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Oops! I couldn't save the task list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] test save failure
+Now you have 1 tasks in the list.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all ten documented cases passed; testing stopped after the final case as required.
