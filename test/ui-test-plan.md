@@ -531,6 +531,94 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
+### UI-012: Reject invalid date and time input
+
+**Aim:** Verify that invalid deadline and event date/time details are reported without terminating Bob or adding invalid tasks.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+deadline submit report /by tomorrow
+event project meeting /from 2026-02-30 /to 2026-03-01
+todo continue working
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A deadline's '/by' detail must be a valid date or time.
+____________________________________________________________
+Oops! An event's '/from' and '/to' details must be valid dates or times.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-013: Handle invalid saved date formatting
+
+**Aim:** Verify that a structurally valid saved task with an invalid date is rejected as malformed saved data.
+
+**Fixture before running:** Replace `data/Bob.txt` with:
+```text
+[D][ ] submit report (by: not-a-date)
+```
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
 ## Test session
 
 ### Test session: 2026-08-25 20:59:29 +08:00
@@ -2629,3 +2717,100 @@ ____________________________________________________________
 **Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
 
 **Overall result:** PASS — all eleven documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-08-31 14:30:00 +08:00
+
+**Plan revision:** Increment 2 invalid date/time input and malformed saved date handling.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case ran from a fresh isolated directory under `_temp/ui-session-20260831-level8-increment2-final`, containing a copy of `build/classes/java/main`. UI-013 used the documented structurally valid task with an invalid date detail.
+
+**Build command:** `gradlew.bat clean check` — passed with no compiler or test failures.
+
+#### UI-001 to UI-011
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:** The inputs documented for UI-001 through UI-011, in order.
+
+**Actual output:** Each case matched its expected output and the complete actual outputs are recorded in the preceding Level 8 increment 1 test session.
+
+**Result:** PASS — UI-001 through UI-011 all passed with exit code 0, empty stderr, and exact output after the documented trailing-space normalization.
+
+#### UI-012
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline submit report /by tomorrow
+event project meeting /from 2026-02-30 /to 2026-03-01
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A deadline's '/by' detail must be a valid date or time.
+____________________________________________________________
+Oops! An event's '/from' and '/to' details must be valid dates or times.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-013
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all thirteen documented cases passed; testing stopped after the final case as required.

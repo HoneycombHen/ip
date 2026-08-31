@@ -1,3 +1,4 @@
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -64,7 +65,11 @@ public class Bob {
                 throw new BobException("A deadline needs a description and a '/by' detail.");
             }
 
-            return new Deadline(parts[0].trim(), parts[1].trim());
+            try {
+                return new Deadline(parts[0].trim(), parts[1].trim());
+            } catch (DateTimeParseException e) {
+                throw new BobException("A deadline's '/by' detail must be a valid date or time.");
+            }
         }
 
         if (input.equals("event") || input.startsWith("event ")) {
@@ -87,7 +92,11 @@ public class Bob {
                 throw new BobException("Event description, '/from', and '/to' details are required.");
             }
 
-            return new Event(description, from, to);
+            try {
+                return new Event(description, from, to);
+            } catch (DateTimeParseException e) {
+                throw new BobException("An event's '/from' and '/to' details must be valid dates or times.");
+            }
         }
 
         throw new BobException(
