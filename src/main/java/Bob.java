@@ -1,5 +1,9 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
 
 /**
@@ -100,7 +104,7 @@ public class Bob {
         }
 
         throw new BobException(
-                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, or bye.");
     }
 
     /**
@@ -115,6 +119,86 @@ public class Bob {
         System.out.println(task);
         System.out.printf("Now you have %d tasks in the list.%n", taskCount);
         System.out.println(horizontalLine);
+    }
+
+    /**
+     * Parses the optional number of days for an upcoming command.
+     *
+     * @param input the trimmed upcoming command
+     * @return the requested number of days, defaulting to seven
+     * @throws BobException if the command contains an invalid number of days
+     */
+    private static int getUpcomingDays(String input) throws BobException {
+        String[] parts = input.split("\\s+");
+        if (parts.length == 1) {
+            return 7;
+        }
+        if (parts.length != 2) {
+            throw new BobException("Please use the format: upcoming [number of days].");
+        }
+
+        try {
+            int days = Integer.parseInt(parts[1]);
+            if (days < 0) {
+                throw new BobException("Please enter a non-negative number of days.");
+            }
+            return days;
+        } catch (NumberFormatException e) {
+            throw new BobException("Please enter a valid number of days.");
+        }
+    }
+
+    /**
+     * Prints tasks whose relevant date falls within the upcoming date range.
+     *
+     * @param taskList tasks to search
+     * @param days number of days after today to include
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printUpcomingTasks(ArrayList<Task> taskList, int days, String horizontalLine) {
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusDays(days);
+        ArrayList<Task> upcomingTasks = taskList.stream()
+                .filter(task -> isUpcoming(task, today, endDate))
+                .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        System.out.printf("Here are the upcoming tasks in the next %d days:%n%n", days);
+        for (int j = 0; j < upcomingTasks.size(); j++) {
+            System.out.printf("%d.%s%n", j + 1, upcomingTasks.get(j));
+        }
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Checks whether a deadline or event starts within the requested date range.
+     *
+     * @param task task to inspect
+     * @param startDate first date in the range
+     * @param endDate last date in the range
+     * @return true if the task's relevant date is in the range
+     */
+    private static boolean isUpcoming(Task task, LocalDate startDate, LocalDate endDate) {
+        if (!(task instanceof Deadline) && !(task instanceof Event)) {
+            return false;
+        }
+
+        LocalDate taskDate = getTaskDateTime(task).toLocalDate();
+        return !taskDate.isBefore(startDate) && !taskDate.isAfter(endDate);
+    }
+
+    /**
+     * Returns the date and time used to order a deadline or event.
+     *
+     * @param task task whose date or time should be returned
+     * @return the deadline date or event start date and time
+     */
+    private static LocalDateTime getTaskDateTime(Task task) {
+        Temporal temporal = task instanceof Deadline deadline ? deadline.getBy() : ((Event) task).getFrom();
+        if (temporal instanceof LocalDateTime dateTime) {
+            return dateTime;
+        }
+        return ((LocalDate) temporal).atStartOfDay();
     }
 
     public static void main(String[] args) {
@@ -152,6 +236,13 @@ public class Bob {
                     System.out.printf("%d.%s%n", (j + 1), task);
                 }
                 System.out.println(horizontalLine);
+            } else if (input.equals("upcoming") || input.startsWith("upcoming ")) {
+                try {
+                    int days = getUpcomingDays(input);
+                    printUpcomingTasks(taskList, days, horizontalLine);
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
+                }
             } else if (input.equals("mark") || input.startsWith("mark ")) {
                 String[] parts = input.trim().split("\\s+");
                 int index;

@@ -43,7 +43,7 @@ What can I do for you?
 ____________________________________________________________
 Oops! A todo must have a description.
 ____________________________________________________________
-Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, or bye.
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -614,6 +614,105 @@ Oops! I couldn't load the saved tasks. Starting with an empty list.
 ____________________________________________________________
 Here are the tasks in your list:
 
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-014: List upcoming dated tasks
+
+**Aim:** Verify that `upcoming [days]` includes deadlines and event starts in the requested range and sorts them chronologically. The distant fixture dates make this case independent of the current date.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+deadline submit annual report /by 9999-12-31
+event future meeting /from 9999-12-30 /to 9999-12-30
+upcoming 3000000
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the upcoming tasks in the next 3000000 days:
+
+1.[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+2.[D][ ] submit annual report (by: Fri, Dec 31 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-015: Validate upcoming command arguments
+
+**Aim:** Verify that the default seven-day range works and malformed `upcoming` arguments are reported without terminating Bob.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+upcoming
+upcoming nope
+upcoming -1
+todo continue working
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the upcoming tasks in the next 7 days:
+
+____________________________________________________________
+Oops! Please enter a valid number of days.
+____________________________________________________________
+Oops! Please enter a non-negative number of days.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -2276,7 +2375,7 @@ What can I do for you?
 ____________________________________________________________
 Oops! A todo must have a description.
 ____________________________________________________________
-Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, or bye.
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -2814,3 +2913,229 @@ ____________________________________________________________
 **Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
 
 **Overall result:** PASS — all thirteen documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-08-31 15:30:00 +08:00
+
+**Plan revision:** Increment 3 `upcoming [days]` command with default range, date filtering, chronological ordering, and argument validation.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case ran from a fresh isolated directory under `_temp/ui-session-20260831-upcoming-final2`, containing a copy of `build/classes/java/main`. UI-014 used distant fixture dates so its inclusion and ordering check was independent of the current date.
+
+**Build command:** `gradlew.bat clean check` — passed with no compiler or test failures.
+
+#### UI-001 to UI-013
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:** The inputs documented for UI-001 through UI-013, in order.
+
+**Actual output:** Each case matched its expected output and the complete actual outputs are recorded in the preceding test sessions.
+
+**Result:** PASS — UI-001 through UI-013 all passed with exit code 0, empty stderr, and exact output after the documented trailing-space normalization.
+
+#### UI-014
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline submit annual report /by 9999-12-31
+event future meeting /from 9999-12-30 /to 9999-12-30
+upcoming 3000000
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the upcoming tasks in the next 3000000 days:
+
+1.[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+2.[D][ ] submit annual report (by: Fri, Dec 31 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-015
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+upcoming
+upcoming nope
+upcoming -1
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the upcoming tasks in the next 7 days:
+
+____________________________________________________________
+Oops! Please enter a valid number of days.
+____________________________________________________________
+Oops! Please enter a non-negative number of days.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all fifteen documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-08-31 16:30:00 +08:00
+
+**Plan revision:** Increment 3 `upcoming [days]` command with default range, date filtering, chronological ordering, and argument validation.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case ran from a fresh isolated directory under `_temp/ui-session-20260831-upcoming-final2`, containing a copy of `build/classes/java/main`. UI-014 used distant fixture dates so its inclusion and ordering check was independent of the current date.
+
+**Build command:** `gradlew.bat clean check` — passed with no compiler or test failures.
+
+#### UI-001 to UI-013
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:** The inputs documented for UI-001 through UI-013, in order.
+
+**Actual output:** Each case matched its expected output and the complete actual outputs are recorded in the preceding test sessions.
+
+**Result:** PASS — UI-001 through UI-013 all passed with exit code 0, empty stderr, and exact output after the documented trailing-space normalization.
+
+#### UI-014
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline submit annual report /by 9999-12-31
+event future meeting /from 9999-12-30 /to 9999-12-30
+upcoming 3000000
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the upcoming tasks in the next 3000000 days:
+
+1.[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+2.[D][ ] submit annual report (by: Fri, Dec 31 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-015
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+upcoming
+upcoming nope
+upcoming -1
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the upcoming tasks in the next 7 days:
+
+____________________________________________________________
+Oops! Please enter a valid number of days.
+____________________________________________________________
+Oops! Please enter a non-negative number of days.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all fifteen documented cases passed; testing stopped after the final case as required.
