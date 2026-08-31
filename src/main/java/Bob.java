@@ -120,7 +120,13 @@ public class Bob {
         System.out.println("Hello! I'm Bob.\n" + "What can I do for you?");
         System.out.println(horizontalLine);
 
-        ArrayList<Task> taskList = new ArrayList<>();
+        ArrayList<Task> taskList;
+        try {
+            taskList = new ArrayList<>(Storage.loadTasks());
+        } catch (StorageException e) {
+            taskList = new ArrayList<>();
+            printStorageError("I couldn't load the saved tasks. Starting with an empty list.", horizontalLine);
+        }
 
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
@@ -149,6 +155,7 @@ public class Bob {
 
                 Task task = taskList.get(index);
                 task.setDone();
+                saveTasks(taskList, horizontalLine);
 
                 System.out.println("Nice! I've marked this task as done:\n" + "  [X] " + task.getDescription());
                 System.out.println(horizontalLine);
@@ -165,6 +172,7 @@ public class Bob {
                 Task task = taskList.get(index);
                 System.out.println("OK, I've marked this task as not done yet:\n" + "  [ ] " + task.getDescription());
                 task.setUndone();
+                saveTasks(taskList, horizontalLine);
                 System.out.println(horizontalLine);
             } else if (input.equals("delete") || input.startsWith("delete ")) {
                 String[] parts = input.split("\\s+");
@@ -177,6 +185,7 @@ public class Bob {
                 }
 
                 Task removedTask = taskList.remove(index);
+                saveTasks(taskList, horizontalLine);
 
                 System.out.println("Noted. I've removed this task:\n" + "    " + removedTask);
                 System.out.printf("Now you have %d tasks in the list.%n", taskList.size());
@@ -192,6 +201,7 @@ public class Bob {
                 }
 
                 taskList.add(newTask);
+                saveTasks(taskList, horizontalLine);
                 printAddedTask(newTask, taskList.size(), horizontalLine);
             }
         }
@@ -205,6 +215,31 @@ public class Bob {
      */
     private static void printError(BobException exception, String horizontalLine) {
         System.out.println("Oops! " + exception.getMessage());
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Saves tasks and reports a storage problem without terminating Bob.
+     *
+     * @param taskList current task list to save
+     * @param horizontalLine separator used by the interface
+     */
+    private static void saveTasks(ArrayList<Task> taskList, String horizontalLine) {
+        try {
+            Storage.saveTasks(taskList);
+        } catch (StorageException e) {
+            printStorageError("I couldn't save the task list.", horizontalLine);
+        }
+    }
+
+    /**
+     * Displays a storage error without terminating the command loop.
+     *
+     * @param message user-facing explanation of the storage problem
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printStorageError(String message, String horizontalLine) {
+        System.out.println("Oops! " + message);
         System.out.println(horizontalLine);
     }
 }
