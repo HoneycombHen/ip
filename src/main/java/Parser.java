@@ -6,11 +6,51 @@ import java.time.temporal.Temporal;
  * Parses user commands into task data and command arguments.
  */
 public class Parser {
+    private static final String UNKNOWN_COMMAND_MESSAGE =
+            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.";
 
     /**
      * Creates a parser for Bob commands.
      */
     public Parser() {}
+
+    /**
+     * Recognizes the action represented by a user command.
+     *
+     * @param input the trimmed user command
+     * @return a command containing its recognized type and original input
+     * @throws BobException if the command is not recognized
+     */
+    public Command parseCommand(String input) throws BobException {
+        if (input.equals("bye")) {
+            return new Command(Command.Type.BYE, input);
+        }
+        if (input.equals("list")) {
+            return new Command(Command.Type.LIST, input);
+        }
+        if (input.equals("upcoming") || input.startsWith("upcoming ")) {
+            return new Command(Command.Type.UPCOMING, input);
+        }
+        if (input.equals("on") || input.startsWith("on ")) {
+            return new Command(Command.Type.ON, input);
+        }
+        if (input.equals("overdue") || input.startsWith("overdue ")) {
+            return new Command(Command.Type.OVERDUE, input);
+        }
+        if (input.equals("mark") || input.startsWith("mark ")) {
+            return new Command(Command.Type.MARK, input);
+        }
+        if (input.equals("unmark") || input.startsWith("unmark ")) {
+            return new Command(Command.Type.UNMARK, input);
+        }
+        if (input.equals("delete") || input.startsWith("delete ")) {
+            return new Command(Command.Type.DELETE, input);
+        }
+        if (isTaskCommand(input)) {
+            return new Command(Command.Type.TASK, input);
+        }
+        throw new BobException(UNKNOWN_COMMAND_MESSAGE);
+    }
 
     /**
      * Creates a task from a todo, deadline, or event command.
@@ -77,8 +117,7 @@ public class Parser {
             }
         }
 
-        throw new BobException(
-                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.");
+        throw new BobException(UNKNOWN_COMMAND_MESSAGE);
     }
 
     /**
@@ -132,5 +171,20 @@ public class Parser {
             // Report the invalid date using Bob's normal input-error flow.
         }
         throw new BobException("Please enter a valid date in the format: yyyy-MM-dd.");
+    }
+
+    /**
+     * Checks whether the input starts with a supported task command.
+     *
+     * @param input the trimmed user command
+     * @return true if the input is a todo, deadline, or event command
+     */
+    private boolean isTaskCommand(String input) {
+        return input.equals("todo")
+                || input.startsWith("todo ")
+                || input.equals("deadline")
+                || input.startsWith("deadline ")
+                || input.equals("event")
+                || input.startsWith("event ");
     }
 }

@@ -150,88 +150,103 @@ public class Bob {
         while (ui.hasNextCommand()) {
             String input = ui.readCommand();
 
-            if (input.equals("bye")) {
-                ui.showGoodbye();
-                break;
-            } else if (input.equals("list")) {
-                ui.showTaskList(taskList.asList());
-            } else if (input.equals("upcoming") || input.startsWith("upcoming ")) {
-                try {
-                    int days = parser.parseUpcomingDays(input);
-                    ui.showUpcomingTasks(getUpcomingTasks(taskList, days), days);
-                } catch (BobException e) {
-                    ui.showError(e);
-                }
-            } else if (input.equals("on") || input.startsWith("on ")) {
-                try {
-                    LocalDate date = parser.parseOnDate(input);
-                    ui.showTasksOnDate(getTasksOnDate(taskList, date), date);
-                } catch (BobException e) {
-                    ui.showError(e);
-                }
-            } else if (input.equals("overdue") || input.startsWith("overdue ")) {
-                if (input.equals("overdue")) {
-                    ui.showOverdueTasks(getOverdueTasks(taskList));
-                } else {
-                    ui.showError(new BobException("Please use the format: overdue."));
-                }
-            } else if (input.equals("mark") || input.startsWith("mark ")) {
-                String[] parts = input.trim().split("\\s+");
-                int index;
-                try {
-                    index = taskList.getIndex(parts, "mark");
-                } catch (BobException e) {
-                    ui.showError(e);
-                    continue;
-                }
+            Command command;
+            try {
+                command = parser.parseCommand(input);
+            } catch (BobException e) {
+                ui.showError(e);
+                continue;
+            }
 
-                Task task = taskList.get(index);
-                task.setDone();
-                saveTasks(taskList, ui);
-
-                ui.showMarkedTask(task);
-            } else if (input.equals("unmark") || input.startsWith("unmark ")) {
-                String[] parts = input.split("\\s+");
-                int index;
-                try {
-                    index = taskList.getIndex(parts, "unmark");
-                } catch (BobException e) {
-                    ui.showError(e);
-                    continue;
+            switch (command.getType()) {
+                case BYE -> {
+                    ui.showGoodbye();
+                    return;
                 }
-
-                Task task = taskList.get(index);
-                ui.showUnmarkedTask(task);
-                task.setUndone();
-                saveTasks(taskList, ui);
-                ui.showSeparator();
-            } else if (input.equals("delete") || input.startsWith("delete ")) {
-                String[] parts = input.split("\\s+");
-                int index;
-                try {
-                    index = taskList.getIndex(parts, "delete");
-                } catch (BobException e) {
-                    ui.showError(e);
-                    continue;
+                case LIST -> ui.showTaskList(taskList.asList());
+                case UPCOMING -> {
+                    try {
+                        int days = parser.parseUpcomingDays(command.getInput());
+                        ui.showUpcomingTasks(getUpcomingTasks(taskList, days), days);
+                    } catch (BobException e) {
+                        ui.showError(e);
+                    }
                 }
-
-                Task removedTask = taskList.remove(index);
-                saveTasks(taskList, ui);
-
-                ui.showDeletedTask(removedTask, taskList.size());
-            } else {
-                Task newTask;
-                try {
-                    newTask = parser.parseTask(input);
-
-                } catch (BobException e) {
-                    ui.showError(e);
-                    continue;
+                case ON -> {
+                    try {
+                        LocalDate date = parser.parseOnDate(command.getInput());
+                        ui.showTasksOnDate(getTasksOnDate(taskList, date), date);
+                    } catch (BobException e) {
+                        ui.showError(e);
+                    }
                 }
+                case OVERDUE -> {
+                    if (command.getInput().equals("overdue")) {
+                        ui.showOverdueTasks(getOverdueTasks(taskList));
+                    } else {
+                        ui.showError(new BobException("Please use the format: overdue."));
+                    }
+                }
+                case MARK -> {
+                    String[] parts = command.getInput().trim().split("\\s+");
+                    int index;
+                    try {
+                        index = taskList.getIndex(parts, "mark");
+                    } catch (BobException e) {
+                        ui.showError(e);
+                        continue;
+                    }
 
-                taskList.add(newTask);
-                saveTasks(taskList, ui);
-                ui.showAddedTask(newTask, taskList.size());
+                    Task task = taskList.get(index);
+                    task.setDone();
+                    saveTasks(taskList, ui);
+
+                    ui.showMarkedTask(task);
+                }
+                case UNMARK -> {
+                    String[] parts = command.getInput().split("\\s+");
+                    int index;
+                    try {
+                        index = taskList.getIndex(parts, "unmark");
+                    } catch (BobException e) {
+                        ui.showError(e);
+                        continue;
+                    }
+
+                    Task task = taskList.get(index);
+                    ui.showUnmarkedTask(task);
+                    task.setUndone();
+                    saveTasks(taskList, ui);
+                    ui.showSeparator();
+                }
+                case DELETE -> {
+                    String[] parts = command.getInput().split("\\s+");
+                    int index;
+                    try {
+                        index = taskList.getIndex(parts, "delete");
+                    } catch (BobException e) {
+                        ui.showError(e);
+                        continue;
+                    }
+
+                    Task removedTask = taskList.remove(index);
+                    saveTasks(taskList, ui);
+
+                    ui.showDeletedTask(removedTask, taskList.size());
+                }
+                case TASK -> {
+                    Task newTask;
+                    try {
+                        newTask = parser.parseTask(command.getInput());
+                    } catch (BobException e) {
+                        ui.showError(e);
+                        continue;
+                    }
+
+                    taskList.add(newTask);
+                    saveTasks(taskList, ui);
+                    ui.showAddedTask(newTask, taskList.size());
+                }
             }
         }
     }
