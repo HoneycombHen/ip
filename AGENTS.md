@@ -40,9 +40,24 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
-Do not commit or push unless explicitly asked.
+Apply the project-local `$seedu-git-standard` skill to every proposed or
+created commit message. Subjects should target 50 characters, must not exceed
+72 characters, and must use an imperative, capitalized form without a trailing
+period. Non-trivial commits must include a 72-character-wrapped body explaining
+what changed and why.
+Git control rule:
+
+- Never stage, commit, amend, tag, push, reset, checkout, rebase, merge, or otherwise modify Git state automatically.
+- Requests to split work into commits are planning instructions only, not authorization.
+- You may inspect Git and prepare commit messages or commands.
+- Before any Git write operation, stop and ask me to approve the exact files, command, and commit message.
+- Leave all changes in the working tree unless I explicitly approve that specific Git operation.
 
 ## Project conventions
+
+Apply the project-local `$seedu-java-coding-standard` skill to all Java source
+code in this repository. It is based on the SE-EDU basic and intermediate Java
+standard and supplements the formatter configuration below.
 
 Apply the following references in this order:
 
@@ -65,8 +80,7 @@ Use English and American spelling in source comments and documentation. Add
 Javadoc to every class and public method unless one of the documented
 exceptions applies. Keep packages, names, imports, braces, indentation,
 whitespace, line length, and Markdown structure consistent with the references.
-Use imperative, capitalized Git commit subjects without a trailing period; do
-not commit or push unless the user explicitly requests it.
+Use imperative, capitalized Git commit subjects without a trailing period.
 
 ## Codex workflow
 
