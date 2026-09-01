@@ -1,4 +1,9 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
 
 /**
@@ -35,7 +40,7 @@ public class Bob {
 
     /**
      * Creates a task from a todo, deadline, or event command.
-     * Dates and times are intentionally kept as strings for this level.
+     * Date and time details are parsed by the deadline and event task classes.
      *
      * @param input the trimmed user command
      * @return a new task
@@ -64,7 +69,11 @@ public class Bob {
                 throw new BobException("A deadline needs a description and a '/by' detail.");
             }
 
-            return new Deadline(parts[0].trim(), parts[1].trim());
+            try {
+                return new Deadline(parts[0].trim(), parts[1].trim());
+            } catch (DateTimeParseException e) {
+                throw new BobException("A deadline's '/by' detail must be a valid date or time.");
+            }
         }
 
         if (input.equals("event") || input.startsWith("event ")) {
@@ -87,11 +96,15 @@ public class Bob {
                 throw new BobException("Event description, '/from', and '/to' details are required.");
             }
 
-            return new Event(description, from, to);
+            try {
+                return new Event(description, from, to);
+            } catch (DateTimeParseException e) {
+                throw new BobException("An event's '/from' and '/to' details must be valid dates or times.");
+            }
         }
 
         throw new BobException(
-                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.");
     }
 
     /**
@@ -106,6 +119,205 @@ public class Bob {
         System.out.println(task);
         System.out.printf("Now you have %d tasks in the list.%n", taskCount);
         System.out.println(horizontalLine);
+    }
+
+    /**
+     * Parses the optional number of days for an upcoming command.
+     *
+     * @param input the trimmed upcoming command
+     * @return the requested number of days, defaulting to seven
+     * @throws BobException if the command contains an invalid number of days
+     */
+    private static int getUpcomingDays(String input) throws BobException {
+        String[] parts = input.split("\\s+");
+        if (parts.length == 1) {
+            return 7;
+        }
+        if (parts.length != 2) {
+            throw new BobException("Please use the format: upcoming [number of days].");
+        }
+
+        try {
+            int days = Integer.parseInt(parts[1]);
+            if (days < 0) {
+                throw new BobException("Please enter a non-negative number of days.");
+            }
+            return days;
+        } catch (NumberFormatException e) {
+            throw new BobException("Please enter a valid number of days.");
+        }
+    }
+
+    /**
+     * Parses the date supplied to an on command.
+     *
+     * @param input the trimmed on command
+     * @return the requested date
+     * @throws BobException if the command does not contain a valid date
+     */
+    private static LocalDate getOnDate(String input) throws BobException {
+        String dateInput = input.length() <= "on".length()
+                ? ""
+                : input.substring("on".length()).trim();
+        if (dateInput.isEmpty()) {
+            throw new BobException("Please use the format: on <date>.");
+        }
+
+        try {
+            Temporal temporal = DateTimeParser.parse(dateInput);
+            if (temporal instanceof LocalDate date) {
+                return date;
+            }
+        } catch (DateTimeParseException e) {
+            // Report the invalid date using Bob's normal input-error flow.
+        }
+        throw new BobException("Please enter a valid date in the format: yyyy-MM-dd.");
+    }
+
+    /**
+     * Prints tasks whose relevant date falls within the upcoming date range.
+     *
+     * @param taskList tasks to search
+     * @param days number of days after today to include
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printUpcomingTasks(ArrayList<Task> taskList, int days, String horizontalLine) {
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusDays(days);
+        ArrayList<Task> upcomingTasks = taskList.stream()
+                .filter(task -> isUpcoming(task, today, endDate))
+                .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        System.out.printf("Here are the upcoming tasks in the next %d days:%n%n", days);
+        for (int j = 0; j < upcomingTasks.size(); j++) {
+            System.out.printf("%d.%s%n", j + 1, upcomingTasks.get(j));
+        }
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Prints deadlines and events scheduled on a date.
+     *
+     * @param taskList tasks to search
+     * @param date date to search for
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printTasksOnDate(ArrayList<Task> taskList, LocalDate date, String horizontalLine) {
+        ArrayList<Task> matchingTasks = taskList.stream()
+                .filter(task -> isOnDate(task, date))
+                .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        System.out.printf("Here are the tasks on %s:%n%n", DateTimeParser.format(date));
+        for (int j = 0; j < matchingTasks.size(); j++) {
+            System.out.printf("%d.%s%n", j + 1, matchingTasks.get(j));
+        }
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Checks whether a deadline or event is scheduled on a date.
+     *
+     * @param task task to inspect
+     * @param date date to check
+     * @return true if the task occurs on the date
+     */
+    private static boolean isOnDate(Task task, LocalDate date) {
+        if (task instanceof Deadline) {
+            return getTaskDateTime(task).toLocalDate().equals(date);
+        }
+        if (task instanceof Event event) {
+            LocalDate fromDate = getTaskDateTime(event).toLocalDate();
+            LocalDate toDate = getDateTime(event.getTo()).toLocalDate();
+            return !date.isBefore(fromDate) && !date.isAfter(toDate);
+        }
+        return false;
+    }
+
+    /**
+     * Converts a stored temporal value to a local date-time for comparisons.
+     *
+     * @param temporal date or local date-time to convert
+     * @return local date-time representation
+     */
+    private static LocalDateTime getDateTime(Temporal temporal) {
+        if (temporal instanceof LocalDateTime dateTime) {
+            return dateTime;
+        }
+        return ((LocalDate) temporal).atStartOfDay();
+    }
+
+    /**
+     * Prints incomplete deadlines that are past their due date or time.
+     *
+     * @param taskList tasks to search
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printOverdueTasks(ArrayList<Task> taskList, String horizontalLine) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
+        ArrayList<Task> overdueTasks = taskList.stream()
+                .filter(task -> isOverdue(task, today, now))
+                .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        System.out.println("Here are your overdue tasks:\n");
+        for (int j = 0; j < overdueTasks.size(); j++) {
+            System.out.printf("%d.%s%n", j + 1, overdueTasks.get(j));
+        }
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Checks whether a task is an incomplete deadline that has passed.
+     *
+     * @param task task to inspect
+     * @param today current local date
+     * @param now current local date-time
+     * @return true if the task is an overdue deadline
+     */
+    private static boolean isOverdue(Task task, LocalDate today, LocalDateTime now) {
+        if (!(task instanceof Deadline deadline) || task.isDone()) {
+            return false;
+        }
+
+        Temporal temporal = deadline.getBy();
+        if (temporal instanceof LocalDate date) {
+            return date.isBefore(today);
+        }
+        return ((LocalDateTime) temporal).isBefore(now);
+    }
+
+    /**
+     * Checks whether a deadline or event starts within the requested date range.
+     *
+     * @param task task to inspect
+     * @param startDate first date in the range
+     * @param endDate last date in the range
+     * @return true if the task's relevant date is in the range
+     */
+    private static boolean isUpcoming(Task task, LocalDate startDate, LocalDate endDate) {
+        if (!(task instanceof Deadline) && !(task instanceof Event)) {
+            return false;
+        }
+
+        LocalDate taskDate = getTaskDateTime(task).toLocalDate();
+        return !taskDate.isBefore(startDate) && !taskDate.isAfter(endDate);
+    }
+
+    /**
+     * Returns the date and time used to order a deadline or event.
+     *
+     * @param task task whose date or time should be returned
+     * @return the deadline date or event start date and time
+     */
+    private static LocalDateTime getTaskDateTime(Task task) {
+        Temporal temporal = task instanceof Deadline deadline ? deadline.getBy() : ((Event) task).getFrom();
+        if (temporal instanceof LocalDateTime dateTime) {
+            return dateTime;
+        }
+        return ((LocalDate) temporal).atStartOfDay();
     }
 
     public static void main(String[] args) {
@@ -143,6 +355,26 @@ public class Bob {
                     System.out.printf("%d.%s%n", (j + 1), task);
                 }
                 System.out.println(horizontalLine);
+            } else if (input.equals("upcoming") || input.startsWith("upcoming ")) {
+                try {
+                    int days = getUpcomingDays(input);
+                    printUpcomingTasks(taskList, days, horizontalLine);
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
+                }
+            } else if (input.equals("on") || input.startsWith("on ")) {
+                try {
+                    LocalDate date = getOnDate(input);
+                    printTasksOnDate(taskList, date, horizontalLine);
+                } catch (BobException e) {
+                    printError(e, horizontalLine);
+                }
+            } else if (input.equals("overdue") || input.startsWith("overdue ")) {
+                if (input.equals("overdue")) {
+                    printOverdueTasks(taskList, horizontalLine);
+                } else {
+                    printError(new BobException("Please use the format: overdue."), horizontalLine);
+                }
             } else if (input.equals("mark") || input.startsWith("mark ")) {
                 String[] parts = input.trim().split("\\s+");
                 int index;
