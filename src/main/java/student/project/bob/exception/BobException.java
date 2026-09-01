@@ -1,3 +1,5 @@
+package student.project.bob.exception;
+
 /**
  * Represents an error caused by invalid input to Bob.
  *

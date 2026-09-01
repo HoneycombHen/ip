@@ -13,7 +13,7 @@ java {
 }
 
 application {
-    mainClass = 'Bob'
+    mainClass = 'student.project.bob.Bob'
 }
 
 tasks.named('test') {

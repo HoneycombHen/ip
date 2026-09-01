@@ -1,4 +1,7 @@
+package student.project.bob.model;
+
 import java.time.temporal.Temporal;
+import student.project.bob.util.DateTimeParser;
 
 /**
  * A task that must be completed before a specified date or time.

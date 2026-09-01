@@ -1,3 +1,5 @@
+package student.project.bob.parser;
+
 /**
  * Represents a command recognized by Bob's parser.
  */
