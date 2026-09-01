@@ -72,6 +72,28 @@ public class BobTest {
     }
 
     /**
+     * Verifies that find searches task descriptions across task types and ignores letter case.
+     */
+    @Test
+    public void main_findCommand_displaysMatchingTaskDescriptions() throws Exception {
+        createDataFile("");
+
+        String output = runBob("todo read book\n"
+                + "deadline return book /by 9999-12-31\n"
+                + "todo write report\n"
+                + "find BOOK\n"
+                + "bye\n");
+
+        assertTrue(output.contains("Here are the matching tasks in your list:"), output);
+        assertTrue(output.contains("1.[T][ ] read book"), output);
+        assertTrue(output.contains("2.[D][ ] return book (by: Fri, Dec 31 9999)"), output);
+        assertTrue(
+                !output.substring(output.indexOf("Here are the matching tasks in your list:"))
+                        .contains("write report"),
+                output);
+    }
+
+    /**
      * Verifies that invalid commands are reported while Bob continues running.
      */
     @Test

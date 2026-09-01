@@ -110,6 +110,17 @@ public class Ui {
     }
 
     /**
+     * Displays tasks whose descriptions match a search keyword.
+     *
+     * @param tasks tasks selected by the find command
+     */
+    public void showMatchingTasks(List<Task> tasks) {
+        System.out.println("Here are the matching tasks in your list:\n");
+        showNumberedTasks(tasks);
+        showSeparator();
+    }
+
+    /**
      * Displays a confirmation after adding a task.
      *
      * @param task task that was added

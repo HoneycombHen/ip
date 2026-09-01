@@ -15,7 +15,8 @@ import student.project.bob.util.DateTimeParser;
  */
 public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE =
-            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.";
+            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, "
+                    + "overdue, find, or bye.";
 
     /**
      * Creates a parser for Bob commands.
@@ -44,6 +45,9 @@ public class Parser {
         }
         if (input.equals("overdue") || input.startsWith("overdue ")) {
             return new Command(Command.Type.OVERDUE, input);
+        }
+        if (input.equals("find") || input.startsWith("find ")) {
+            return new Command(Command.Type.FIND, input);
         }
         if (input.equals("mark") || input.startsWith("mark ")) {
             return new Command(Command.Type.MARK, input);
@@ -179,6 +183,23 @@ public class Parser {
             // Report the invalid date using Bob's normal input-error flow.
         }
         throw new BobException("Please enter a valid date in the format: yyyy-MM-dd.");
+    }
+
+    /**
+     * Parses the keyword supplied to a find command.
+     *
+     * @param input the trimmed find command
+     * @return the keyword to search for
+     * @throws BobException if the command does not contain a keyword
+     */
+    public String parseFindKeyword(String input) throws BobException {
+        String keyword = input.length() <= "find".length()
+                ? ""
+                : input.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new BobException("Please use the format: find <keyword>.");
+        }
+        return keyword;
     }
 
     /**

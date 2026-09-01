@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Locale;
 import student.project.bob.exception.BobException;
 import student.project.bob.model.Deadline;
 import student.project.bob.model.Event;
@@ -92,6 +93,20 @@ public class Bob {
         return taskList.stream()
                 .filter(task -> isOverdue(task, today, now))
                 .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    /**
+     * Selects tasks whose descriptions contain the supplied keyword.
+     *
+     * @param taskList tasks to search
+     * @param keyword keyword to find in task descriptions
+     * @return matching tasks in their original list order
+     */
+    private static ArrayList<Task> getMatchingTasks(TaskList taskList, String keyword) {
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
+        return taskList.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
@@ -197,6 +212,14 @@ public class Bob {
                         ui.showOverdueTasks(getOverdueTasks(taskList));
                     } else {
                         ui.showError(new BobException("Please use the format: overdue."));
+                    }
+                }
+                case FIND -> {
+                    try {
+                        String keyword = parser.parseFindKeyword(command.getInput());
+                        ui.showMatchingTasks(getMatchingTasks(taskList, keyword));
+                    } catch (BobException e) {
+                        ui.showError(e);
                     }
                 }
                 case MARK -> {

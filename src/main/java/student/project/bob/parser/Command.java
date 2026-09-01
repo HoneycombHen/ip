@@ -13,6 +13,7 @@ public class Command {
         UPCOMING,
         ON,
         OVERDUE,
+        FIND,
         MARK,
         UNMARK,
         DELETE,

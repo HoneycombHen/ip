@@ -150,6 +150,21 @@ public class UiTest {
     }
 
     /**
+     * Verifies matching-task output uses the same numbering and separator as other task queries.
+     */
+    @Test
+    public void showMatchingTasks_tasks_printExpectedList() {
+        ui.showMatchingTasks(List.of(new Todo("read book"), new Todo("return book")));
+
+        assertEquals(
+                normalize("Here are the matching tasks in your list:\n\n"
+                        + "1.[T][ ] read book\n"
+                        + "2.[T][ ] return book\n"
+                        + "____________________________________________________________\n"),
+                outputText());
+    }
+
+    /**
      * Verifies task confirmation messages for adding, marking, unmarking, and deleting.
      */
     @Test

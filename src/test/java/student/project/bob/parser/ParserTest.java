@@ -17,7 +17,7 @@ import student.project.bob.model.Todo;
  */
 public class ParserTest {
     private static final String UNKNOWN_COMMAND_MESSAGE =
-            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.";
+            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, find, or bye.";
 
     /**
      * Verifies that every supported command prefix is classified correctly.
@@ -36,6 +36,8 @@ public class ParserTest {
                         Command.Type.ON, parser.parseCommand("on 2026-01-01").getType()),
                 () -> assertEquals(
                         Command.Type.OVERDUE, parser.parseCommand("overdue").getType()),
+                () -> assertEquals(
+                        Command.Type.FIND, parser.parseCommand("find book").getType()),
                 () -> assertEquals(
                         Command.Type.MARK, parser.parseCommand("mark 1").getType()),
                 () -> assertEquals(
@@ -192,5 +194,19 @@ public class ParserTest {
                         invalidDateMessage,
                         assertThrows(BobException.class, () -> parser.parseOnDate("on 2026-01-01T09:00"))
                                 .getMessage()));
+    }
+
+    /**
+     * Verifies that a find command returns its trimmed keyword and rejects a missing keyword.
+     */
+    @Test
+    public void parseFindKeyword_validAndMissingKeyword_validatesCorrectly() throws BobException {
+        Parser parser = new Parser();
+
+        assertEquals("book", parser.parseFindKeyword("find    book"));
+        assertEquals(
+                "Please use the format: find <keyword>.",
+                assertThrows(BobException.class, () -> parser.parseFindKeyword("find"))
+                        .getMessage());
     }
 }
