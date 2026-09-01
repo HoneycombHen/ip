@@ -1,3 +1,5 @@
+package student.project.bob.storage;
+
 /**
  * Represents a problem while reading or writing Bob's task data.
  */

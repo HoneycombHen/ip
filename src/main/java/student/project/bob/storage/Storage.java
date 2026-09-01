@@ -1,3 +1,5 @@
+package student.project.bob.storage;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -6,6 +8,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import student.project.bob.model.Deadline;
+import student.project.bob.model.Event;
+import student.project.bob.model.Task;
+import student.project.bob.model.Todo;
 
 /**
  * Saves Bob's tasks to the local data file.

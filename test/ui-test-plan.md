@@ -7,7 +7,7 @@ This file is the source of truth for the `test-ui` project skill. Keep test case
 - Working directory: project root for the build; use a fresh isolated directory under `_temp` for each UI test session so existing runtime data is not overwritten. Copy `build/classes/java/main` into that directory's `build/classes/java/main` before running the documented command.
 - Prerequisites: Java 25 (`java --version` and `javac --version`)
 - Build command: `gradlew.bat classes`
-- Run command: `java -cp build/classes/java/main Bob`
+- Run command: `java -cp build/classes/java/main student.project.bob.Bob`
 - Test fixture setup: before each test case, create an empty UTF-8 `data/Bob.txt` file in the isolated working directory unless the test case specifies its own contents. From PowerShell, run `New-Item -ItemType Directory -Force data | Out-Null` followed by `[System.IO.File]::WriteAllText((Join-Path (Get-Location) 'data/Bob.txt'), '')`. UI-008, UI-009, and UI-010 specify their own error fixtures.
 - Output comparison: compare stdout after removing trailing spaces from each line; line content and exit status must otherwise match exactly, and stderr must be empty. This normalization keeps terminal-only padding from being treated as a Markdown trailing-space violation.
 
@@ -19,7 +19,7 @@ This file is the source of truth for the `test-ui` project skill. Keep test case
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -55,7 +55,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -97,7 +97,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -160,7 +160,7 @@ If output is intentionally variable, document the allowed variation and comparis
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -212,7 +212,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -251,7 +251,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -331,7 +331,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -370,7 +370,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -409,7 +409,7 @@ not a valid task line
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -447,7 +447,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -489,7 +489,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -537,7 +537,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -589,7 +589,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -625,7 +625,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -673,7 +673,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -724,7 +724,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -777,7 +777,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -827,7 +827,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -890,7 +890,7 @@ ____________________________________________________________
 
 **Command:**
 ```text
-java -cp build/classes/java/main Bob
+java -cp build/classes/java/main student.project.bob.Bob
 ```
 
 **Inputs:**
@@ -7825,3 +7825,871 @@ ____________________________________________________________
 **Result:** PASS
 
 **Overall result:** PASS — all 19 documented cases passed; testing stopped after the final case as required.
+
+
+### Test session: 2026-09-01 package refactor
+
+**Plan revision:** Package layout updated; active test commands use `student.project.bob.Bob`.
+
+#### UI-001
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+todo
+blah
+bye
+```
+
+**Actual output:**
+```text
+
+```
+
+**Stderr:**
+```text
+Error: Could not find or load main class student.project.bob.Bob
+Caused by: java.lang.ClassNotFoundException: student.project.bob.Bob
+```
+
+**Result:** FAIL
+
+**Overall result:** FAIL — 1 case(s) executed; testing stopped at the first failure.
+
+### Test session: 2026-09-01 package refactor rerun
+
+**Plan revision:** Package layout updated; active test commands use `student.project.bob.Bob`.
+
+#### UI-001
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+todo
+blah
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A todo must have a description.
+____________________________________________________________
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-002
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+deadline project
+event meeting
+mark
+unmark nope
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A deadline needs a description and a '/by' detail.
+____________________________________________________________
+Oops! An event needs a description followed by '/from' and '/to' details.
+____________________________________________________________
+Oops! Please use the format: mark <task number>.
+____________________________________________________________
+Oops! Please enter a valid task number.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-003
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+todo buy milk
+deadline submit report /by 2019-10-15
+event meeting /from 2019-10-16 /to 2019-10-17
+mark 4
+mark 9
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] buy milk
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] buy milk
+2.[D][ ] submit report (by: Tue, Oct 15 2019)
+3.[E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-004
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+todo read book
+todo return book
+delete 1
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] return book
+Now you have 2 tasks in the list.
+____________________________________________________________
+Noted. I've removed this task:
+    [T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] return book
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-005
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+delete
+delete nope
+delete 1
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: delete <task number>.
+____________________________________________________________
+Oops! Please enter a valid task number.
+____________________________________________________________
+Oops! That task number does not exist.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-006
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+todo write report
+deadline submit report /by 2019-10-15
+event team sync /from 2019-10-16 /to 2019-10-17
+mark 1
+unmark 1
+delete 2
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] write report
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] write report
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [ ] write report
+____________________________________________________________
+Noted. I've removed this task:
+    [D][ ] submit report (by: Tue, Oct 15 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] write report
+2.[E][ ] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-007
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][X] buy milk
+2.[D][ ] submit report (by: Tue, Oct 15 2019)
+3.[E][X] team sync (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-008
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-009
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-010
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+todo test save failure
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Oops! I couldn't save the task list.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] test save failure
+Now you have 1 tasks in the list.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-011
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+deadline submit report /by 2019-10-15 18:00
+event project meeting /from 2019-10-16T09:30 /to 2019-10-16T10:45
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit report (by: Tue, Oct 15 2019 18:00)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] project meeting (from: Wed, Oct 16 2019 09:30 to: Wed, Oct 16 2019 10:45)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[D][ ] submit report (by: Tue, Oct 15 2019 18:00)
+2.[E][ ] project meeting (from: Wed, Oct 16 2019 09:30 to: Wed, Oct 16 2019 10:45)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-012
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+deadline submit report /by tomorrow
+event project meeting /from 2026-02-30 /to 2026-03-01
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! A deadline's '/by' detail must be a valid date or time.
+____________________________________________________________
+Oops! An event's '/from' and '/to' details must be valid dates or times.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-013
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! I couldn't load the saved tasks. Starting with an empty list.
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-014
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+deadline submit annual report /by 9999-12-31
+event future meeting /from 9999-12-30 /to 9999-12-30
+upcoming 3000000
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Here are the upcoming tasks in the next 3000000 days:
+
+1.[E][ ] future meeting (from: Thu, Dec 30 9999 to: Thu, Dec 30 9999)
+2.[D][ ] submit annual report (by: Fri, Dec 31 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-015
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+upcoming
+upcoming nope
+upcoming -1
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Here are the upcoming tasks in the next 7 days:
+
+____________________________________________________________
+Oops! Please enter a valid number of days.
+____________________________________________________________
+Oops! Please enter a non-negative number of days.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-016
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+deadline submit annual report /by 9999-12-31
+event multi-day meeting /from 9999-12-29 /to 9999-12-30
+event other meeting /from 9999-12-31 /to 9999-12-31
+on 9999-12-30
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] submit annual report (by: Fri, Dec 31 9999)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] multi-day meeting (from: Wed, Dec 29 9999 to: Thu, Dec 30 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] other meeting (from: Fri, Dec 31 9999 to: Fri, Dec 31 9999)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Here are the tasks on Thu, Dec 30 9999:
+
+1.[E][ ] multi-day meeting (from: Wed, Dec 29 9999 to: Thu, Dec 30 9999)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-017
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+on
+on not-a-date
+on 9999-12-30T09:00
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: on <date>.
+____________________________________________________________
+Oops! Please enter a valid date in the format: yyyy-MM-dd.
+____________________________________________________________
+Oops! Please enter a valid date in the format: yyyy-MM-dd.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-018
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+deadline old report /by 2019-10-15
+deadline future report /by 9999-12-31
+deadline completed report /by 2019-10-16
+event old event /from 2019-10-15 /to 2019-10-16
+mark 3
+overdue
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] old report (by: Tue, Oct 15 2019)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] future report (by: Fri, Dec 31 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] completed report (by: Wed, Oct 16 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] old event (from: Tue, Oct 15 2019 to: Wed, Oct 16 2019)
+Now you have 4 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] completed report
+____________________________________________________________
+Here are your overdue tasks:
+
+1.[D][ ] old report (by: Tue, Oct 15 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+#### UI-019
+
+**Command:** java -cp build/classes/java/main student.project.bob.Bob
+
+**Console input:**
+```text
+overdue now
+overdue
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _     
+| __ )  ___ | |__  
+|  _ \ / _ \| '_ \ 
+| |_) | (_) | |_) |
+|____/ \___/|_.__/ 
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: overdue.
+____________________________________________________________
+Here are your overdue tasks:
+
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS
+
+**Overall result:** PASS — all 19 documented cases passed.

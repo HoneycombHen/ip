@@ -1,3 +1,5 @@
+package student.project.bob.model;
+
 /**
  * Represents a task that can be marked as done or undone.
  */
