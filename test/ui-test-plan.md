@@ -43,7 +43,7 @@ What can I do for you?
 ____________________________________________________________
 Oops! A todo must have a description.
 ____________________________________________________________
-Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, or bye.
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -807,6 +807,117 @@ ____________________________________________________________
 Oops! Please enter a valid date in the format: yyyy-MM-dd.
 ____________________________________________________________
 Oops! Please enter a valid date in the format: yyyy-MM-dd.
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-018: List overdue deadlines
+
+**Aim:** Verify that `overdue` lists incomplete past deadlines, excludes completed deadlines and events, and sorts results by due date.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+deadline old report /by 2019-10-15
+deadline future report /by 9999-12-31
+deadline completed report /by 2019-10-16
+event old event /from 2019-10-15 /to 2019-10-16
+mark 3
+overdue
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] old report (by: Tue, Oct 15 2019)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] future report (by: Fri, Dec 31 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] completed report (by: Wed, Oct 16 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] old event (from: Tue, Oct 15 2019 to: Wed, Oct 16 2019)
+Now you have 4 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] completed report
+____________________________________________________________
+Here are your overdue tasks:
+
+1.[D][ ] old report (by: Tue, Oct 15 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-019: Validate overdue command arguments
+
+**Aim:** Verify that extra arguments to `overdue` are rejected without terminating Bob and that an empty overdue list is displayed correctly.
+
+**Command:**
+```text
+java -cp build/classes/java/main Bob
+```
+
+**Inputs:**
+```text
+overdue now
+overdue
+todo continue working
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: overdue.
+____________________________________________________________
+Here are your overdue tasks:
+
 ____________________________________________________________
 Got it. I've added this task:
 
@@ -3246,6 +3357,131 @@ ____________________________________________________________
 **Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
 
 **Overall result:** PASS — all seventeen documented cases passed; testing stopped after the final case as required.
+
+### Test session: 2026-09-01 10:00:00 +08:00
+
+**Plan revision:** Increment 5 `overdue` command with deadline filtering, completed-task exclusion, event exclusion, and argument validation.
+
+**Fixture setup:** The documented build command was run from the project root. Each UI case ran from a fresh isolated directory under `_temp/ui-session-20260901-overdue-final`, containing a copy of `build/classes/java/main`.
+
+**Build command:** `gradlew.bat clean check` — passed with no compiler or test failures.
+
+#### UI-001 to UI-017
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:** The inputs documented for UI-001 through UI-017, in order.
+
+**Actual output:** Each case matched its expected output and the complete actual outputs are recorded in the preceding test sessions.
+
+**Result:** PASS — UI-001 through UI-017 all passed with exit code 0, empty stderr, and exact output after the documented trailing-space normalization.
+
+#### UI-018
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+deadline old report /by 2019-10-15
+deadline future report /by 9999-12-31
+deadline completed report /by 2019-10-16
+event old event /from 2019-10-15 /to 2019-10-16
+mark 3
+overdue
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] old report (by: Tue, Oct 15 2019)
+Now you have 1 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] future report (by: Fri, Dec 31 9999)
+Now you have 2 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[D][ ] completed report (by: Wed, Oct 16 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+Got it. I've added this task:
+
+[E][ ] old event (from: Tue, Oct 15 2019 to: Wed, Oct 16 2019)
+Now you have 4 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] completed report
+____________________________________________________________
+Here are your overdue tasks:
+
+1.[D][ ] old report (by: Tue, Oct 15 2019)
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+#### UI-019
+
+**Command:** `java -cp build/classes/java/main Bob`
+
+**Console input:**
+```text
+overdue now
+overdue
+todo continue working
+list
+bye
+```
+
+**Actual output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Oops! Please use the format: overdue.
+____________________________________________________________
+Here are your overdue tasks:
+
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] continue working
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] continue working
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Result:** PASS — exit code 0, empty stderr, exact match after the documented trailing-space normalization.
+
+**Overall result:** PASS — all nineteen documented cases passed; testing stopped after the final case as required.
 
 ### Test session: 2026-08-31 16:30:00 +08:00
 

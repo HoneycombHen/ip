@@ -20,6 +20,15 @@ public class Task {
     }
 
     /**
+     * Returns whether this task has been completed.
+     *
+     * @return true if this task is done
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
      * Returns the task in the format used by the list command.
      *
      * @return the task's status and description

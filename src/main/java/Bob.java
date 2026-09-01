@@ -104,7 +104,7 @@ public class Bob {
         }
 
         throw new BobException(
-                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, or bye.");
+                "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, or bye.");
     }
 
     /**
@@ -249,6 +249,47 @@ public class Bob {
     }
 
     /**
+     * Prints incomplete deadlines that are past their due date or time.
+     *
+     * @param taskList tasks to search
+     * @param horizontalLine separator used by the interface
+     */
+    private static void printOverdueTasks(ArrayList<Task> taskList, String horizontalLine) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
+        ArrayList<Task> overdueTasks = taskList.stream()
+                .filter(task -> isOverdue(task, today, now))
+                .sorted(Comparator.comparing(Bob::getTaskDateTime))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        System.out.println("Here are your overdue tasks:\n");
+        for (int j = 0; j < overdueTasks.size(); j++) {
+            System.out.printf("%d.%s%n", j + 1, overdueTasks.get(j));
+        }
+        System.out.println(horizontalLine);
+    }
+
+    /**
+     * Checks whether a task is an incomplete deadline that has passed.
+     *
+     * @param task task to inspect
+     * @param today current local date
+     * @param now current local date-time
+     * @return true if the task is an overdue deadline
+     */
+    private static boolean isOverdue(Task task, LocalDate today, LocalDateTime now) {
+        if (!(task instanceof Deadline deadline) || task.isDone()) {
+            return false;
+        }
+
+        Temporal temporal = deadline.getBy();
+        if (temporal instanceof LocalDate date) {
+            return date.isBefore(today);
+        }
+        return ((LocalDateTime) temporal).isBefore(now);
+    }
+
+    /**
      * Checks whether a deadline or event starts within the requested date range.
      *
      * @param task task to inspect
@@ -327,6 +368,12 @@ public class Bob {
                     printTasksOnDate(taskList, date, horizontalLine);
                 } catch (BobException e) {
                     printError(e, horizontalLine);
+                }
+            } else if (input.equals("overdue") || input.startsWith("overdue ")) {
+                if (input.equals("overdue")) {
+                    printOverdueTasks(taskList, horizontalLine);
+                } else {
+                    printError(new BobException("Please use the format: overdue."), horizontalLine);
                 }
             } else if (input.equals("mark") || input.startsWith("mark ")) {
                 String[] parts = input.trim().split("\\s+");
