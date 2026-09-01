@@ -4,7 +4,6 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Scanner;
 
 /**
  * Runs the Bob task-management application.
@@ -108,20 +107,6 @@ public class Bob {
     }
 
     /**
-     * Prints the common confirmation shown after adding a task.
-     *
-     * @param task task that was added
-     * @param taskCount updated number of tasks
-     * @param horizontalLine separator used by the interface
-     */
-    private static void printAddedTask(Task task, int taskCount, String horizontalLine) {
-        System.out.println("Got it. I've added this task:\n");
-        System.out.println(task);
-        System.out.printf("Now you have %d tasks in the list.%n", taskCount);
-        System.out.println(horizontalLine);
-    }
-
-    /**
      * Parses the optional number of days for an upcoming command.
      *
      * @param input the trimmed upcoming command
@@ -175,45 +160,31 @@ public class Bob {
     }
 
     /**
-     * Prints tasks whose relevant date falls within the upcoming date range.
+     * Selects tasks whose relevant date falls within the upcoming date range.
      *
      * @param taskList tasks to search
      * @param days number of days after today to include
-     * @param horizontalLine separator used by the interface
      */
-    private static void printUpcomingTasks(ArrayList<Task> taskList, int days, String horizontalLine) {
+    private static ArrayList<Task> getUpcomingTasks(ArrayList<Task> taskList, int days) {
         LocalDate today = LocalDate.now();
         LocalDate endDate = today.plusDays(days);
-        ArrayList<Task> upcomingTasks = taskList.stream()
+        return taskList.stream()
                 .filter(task -> isUpcoming(task, today, endDate))
                 .sorted(Comparator.comparing(Bob::getTaskDateTime))
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-
-        System.out.printf("Here are the upcoming tasks in the next %d days:%n%n", days);
-        for (int j = 0; j < upcomingTasks.size(); j++) {
-            System.out.printf("%d.%s%n", j + 1, upcomingTasks.get(j));
-        }
-        System.out.println(horizontalLine);
     }
 
     /**
-     * Prints deadlines and events scheduled on a date.
+     * Selects deadlines and events scheduled on a date.
      *
      * @param taskList tasks to search
      * @param date date to search for
-     * @param horizontalLine separator used by the interface
      */
-    private static void printTasksOnDate(ArrayList<Task> taskList, LocalDate date, String horizontalLine) {
-        ArrayList<Task> matchingTasks = taskList.stream()
+    private static ArrayList<Task> getTasksOnDate(ArrayList<Task> taskList, LocalDate date) {
+        return taskList.stream()
                 .filter(task -> isOnDate(task, date))
                 .sorted(Comparator.comparing(Bob::getTaskDateTime))
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-
-        System.out.printf("Here are the tasks on %s:%n%n", DateTimeParser.format(date));
-        for (int j = 0; j < matchingTasks.size(); j++) {
-            System.out.printf("%d.%s%n", j + 1, matchingTasks.get(j));
-        }
-        System.out.println(horizontalLine);
     }
 
     /**
@@ -249,24 +220,17 @@ public class Bob {
     }
 
     /**
-     * Prints incomplete deadlines that are past their due date or time.
+     * Selects incomplete deadlines that are past their due date or time.
      *
      * @param taskList tasks to search
-     * @param horizontalLine separator used by the interface
      */
-    private static void printOverdueTasks(ArrayList<Task> taskList, String horizontalLine) {
+    private static ArrayList<Task> getOverdueTasks(ArrayList<Task> taskList) {
         LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
-        ArrayList<Task> overdueTasks = taskList.stream()
+        return taskList.stream()
                 .filter(task -> isOverdue(task, today, now))
                 .sorted(Comparator.comparing(Bob::getTaskDateTime))
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-
-        System.out.println("Here are your overdue tasks:\n");
-        for (int j = 0; j < overdueTasks.size(); j++) {
-            System.out.printf("%d.%s%n", j + 1, overdueTasks.get(j));
-        }
-        System.out.println(horizontalLine);
     }
 
     /**
@@ -321,59 +285,44 @@ public class Bob {
     }
 
     public static void main(String[] args) {
-        String banner = " ____        _     \n"
-                + "| __ )  ___ | |__  \n"
-                + "|  _ \\ / _ \\| '_ \\ \n"
-                + "| |_) | (_) | |_) |\n"
-                + "|____/ \\___/|_.__/ \n";
-        String horizontalLine = "____________________________________________________________";
-        System.out.println(horizontalLine);
-        System.out.println(banner);
-        System.out.println("Hello! I'm Bob.\n" + "What can I do for you?");
-        System.out.println(horizontalLine);
+        Ui ui = new Ui();
+        ui.showWelcome();
 
         ArrayList<Task> taskList;
         try {
             taskList = new ArrayList<>(Storage.loadTasks());
         } catch (StorageException e) {
             taskList = new ArrayList<>();
-            printStorageError("I couldn't load the saved tasks. Starting with an empty list.", horizontalLine);
+            ui.showStorageError("I couldn't load the saved tasks. Starting with an empty list.");
         }
 
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine().trim();
+        while (ui.hasNextCommand()) {
+            String input = ui.readCommand();
 
             if (input.equals("bye")) {
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(horizontalLine);
+                ui.showGoodbye();
                 break;
             } else if (input.equals("list")) {
-                System.out.println("Here are the tasks in your list:\n");
-                for (int j = 0; j < taskList.size(); j++) {
-                    Task task = taskList.get(j);
-                    System.out.printf("%d.%s%n", (j + 1), task);
-                }
-                System.out.println(horizontalLine);
+                ui.showTaskList(taskList);
             } else if (input.equals("upcoming") || input.startsWith("upcoming ")) {
                 try {
                     int days = getUpcomingDays(input);
-                    printUpcomingTasks(taskList, days, horizontalLine);
+                    ui.showUpcomingTasks(getUpcomingTasks(taskList, days), days);
                 } catch (BobException e) {
-                    printError(e, horizontalLine);
+                    ui.showError(e);
                 }
             } else if (input.equals("on") || input.startsWith("on ")) {
                 try {
                     LocalDate date = getOnDate(input);
-                    printTasksOnDate(taskList, date, horizontalLine);
+                    ui.showTasksOnDate(getTasksOnDate(taskList, date), date);
                 } catch (BobException e) {
-                    printError(e, horizontalLine);
+                    ui.showError(e);
                 }
             } else if (input.equals("overdue") || input.startsWith("overdue ")) {
                 if (input.equals("overdue")) {
-                    printOverdueTasks(taskList, horizontalLine);
+                    ui.showOverdueTasks(getOverdueTasks(taskList));
                 } else {
-                    printError(new BobException("Please use the format: overdue."), horizontalLine);
+                    ui.showError(new BobException("Please use the format: overdue."));
                 }
             } else if (input.equals("mark") || input.startsWith("mark ")) {
                 String[] parts = input.trim().split("\\s+");
@@ -381,97 +330,72 @@ public class Bob {
                 try {
                     index = getTaskIndex(parts, taskList.size(), "mark");
                 } catch (BobException e) {
-                    printError(e, horizontalLine);
+                    ui.showError(e);
                     continue;
                 }
 
                 Task task = taskList.get(index);
                 task.setDone();
-                saveTasks(taskList, horizontalLine);
+                saveTasks(taskList, ui);
 
-                System.out.println("Nice! I've marked this task as done:\n" + "  [X] " + task.getDescription());
-                System.out.println(horizontalLine);
+                ui.showMarkedTask(task);
             } else if (input.equals("unmark") || input.startsWith("unmark ")) {
                 String[] parts = input.split("\\s+");
                 int index;
                 try {
                     index = getTaskIndex(parts, taskList.size(), "unmark");
                 } catch (BobException e) {
-                    printError(e, horizontalLine);
+                    ui.showError(e);
                     continue;
                 }
 
                 Task task = taskList.get(index);
-                System.out.println("OK, I've marked this task as not done yet:\n" + "  [ ] " + task.getDescription());
+                ui.showUnmarkedTask(task);
                 task.setUndone();
-                saveTasks(taskList, horizontalLine);
-                System.out.println(horizontalLine);
+                saveTasks(taskList, ui);
+                ui.showSeparator();
             } else if (input.equals("delete") || input.startsWith("delete ")) {
                 String[] parts = input.split("\\s+");
                 int index;
                 try {
                     index = getTaskIndex(parts, taskList.size(), "delete");
                 } catch (BobException e) {
-                    printError(e, horizontalLine);
+                    ui.showError(e);
                     continue;
                 }
 
                 Task removedTask = taskList.remove(index);
-                saveTasks(taskList, horizontalLine);
+                saveTasks(taskList, ui);
 
-                System.out.println("Noted. I've removed this task:\n" + "    " + removedTask);
-                System.out.printf("Now you have %d tasks in the list.%n", taskList.size());
-                System.out.println(horizontalLine);
+                ui.showDeletedTask(removedTask, taskList.size());
             } else {
                 Task newTask;
                 try {
                     newTask = createTask(input);
 
                 } catch (BobException e) {
-                    printError(e, horizontalLine);
+                    ui.showError(e);
                     continue;
                 }
 
                 taskList.add(newTask);
-                saveTasks(taskList, horizontalLine);
-                printAddedTask(newTask, taskList.size(), horizontalLine);
+                saveTasks(taskList, ui);
+                ui.showAddedTask(newTask, taskList.size());
             }
         }
-    }
-
-    /**
-     * Displays an input error without terminating the command loop.
-     *
-     * @param exception input error to explain
-     * @param horizontalLine separator used by the interface
-     */
-    private static void printError(BobException exception, String horizontalLine) {
-        System.out.println("Oops! " + exception.getMessage());
-        System.out.println(horizontalLine);
     }
 
     /**
      * Saves tasks and reports a storage problem without terminating Bob.
      *
      * @param taskList current task list to save
-     * @param horizontalLine separator used by the interface
+     * @param ui user interface used to report a storage problem
      */
-    private static void saveTasks(ArrayList<Task> taskList, String horizontalLine) {
+    private static void saveTasks(ArrayList<Task> taskList, Ui ui) {
         try {
             Storage.saveTasks(taskList);
         } catch (StorageException e) {
-            printStorageError("I couldn't save the task list.", horizontalLine);
+            ui.showStorageError("I couldn't save the task list.");
         }
-    }
-
-    /**
-     * Displays a storage error without terminating the command loop.
-     *
-     * @param message user-facing explanation of the storage problem
-     * @param horizontalLine separator used by the interface
-     */
-    private static void printStorageError(String message, String horizontalLine) {
-        System.out.println("Oops! " + message);
-        System.out.println(horizontalLine);
     }
 }
