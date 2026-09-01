@@ -1,5 +1,7 @@
 plugins {
+    id 'java'
     id 'application'
+    id 'com.gradleup.shadow' version '9.5.1'
     id 'com.diffplug.spotless' version '8.10.0'
 }
 
@@ -12,12 +14,44 @@ java {
     }
 }
 
+dependencies {
+    String jUnitVersion = '5.14.4'
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.14.4'
+}
+
 application {
     mainClass = 'student.project.bob.Bob'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+
+        showExceptions = true
+        exceptionFormat = 'full'
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = false
+    }
+}
+
+jar {
+    // A lean JAR file is not needed because the Shadow JAR includes dependencies.
+    enabled = false
+    archiveClassifier = 'without-dependencies'
+}
+
+shadowJar {
+    archiveFileName = 'duke.jar'
+}
+
+run {
+    standardInput = System.in
 }
 
 spotless {
