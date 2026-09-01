@@ -41,6 +41,11 @@ public class Event extends Task {
         return to;
     }
 
+    /**
+     * Returns this event in Bob's display and persistence format.
+     *
+     * @return the event's status, description, and start and end dates or times
+     */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + DateTimeParser.format(from) + " to: " + DateTimeParser.format(to)

@@ -30,6 +30,11 @@ public class Deadline extends Task {
         return by;
     }
 
+    /**
+     * Returns this deadline in Bob's display and persistence format.
+     *
+     * @return the deadline's status, description, and due date or time
+     */
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + DateTimeParser.format(by) + ")";

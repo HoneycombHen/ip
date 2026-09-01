@@ -161,6 +161,11 @@ public class Bob {
         return ((LocalDate) temporal).atStartOfDay();
     }
 
+    /**
+     * Starts Bob and processes commands until the user says goodbye or input ends.
+     *
+     * @param args command-line arguments, which are not used
+     */
     public static void main(String[] args) {
         Ui ui = new Ui();
         Parser parser = new Parser();
