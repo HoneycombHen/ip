@@ -35,3 +35,28 @@ gradlew.bat run
 starts Bob. Formatting and validation rules are configured in `build.gradle`.
 The project uses Palantir Java Format through Spotless because it supports the
 project's four-space indentation and 120-character line-width requirements.
+
+## Creating and running the executable JAR
+
+The project uses the Shadow Gradle plugin to create a fat JAR containing the
+application classes and its runtime dependencies. Run this command from the
+project root:
+
+```text
+gradlew.bat shadowJar
+```
+
+The generated file is `build/libs/bob.jar`. It is ignored by Git because it
+is a generated binary file and should not be committed to the repository.
+
+To run the JAR, copy `bob.jar` into an empty folder, open a command window in
+that folder, and run:
+
+```text
+java -jar "bob.jar"
+```
+
+The quotes are useful when the JAR filename contains spaces or other special
+characters. Running the command from the folder containing the JAR also makes
+Bob's relative `data/Bob.txt` storage file stay alongside that distributed
+copy of the application.

@@ -47,7 +47,12 @@ jar {
 }
 
 shadowJar {
-    archiveFileName = 'duke.jar'
+    archiveFileName = 'bob.jar'
+
+    // Keep the fat JAR directly executable with `java -jar bob.jar`.
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
 }
 
 run {
