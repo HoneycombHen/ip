@@ -11,33 +11,6 @@ import java.util.Comparator;
 public class Bob {
 
     /**
-     * Converts a command's task number into a zero-based array index.
-     *
-     * @param parts command words, such as ["mark", "1"]
-     * @param taskCount number of tasks currently stored
-     * @param commandName command being validated
-     * @return the zero-based task index
-     * @throws BobException if the command does not contain a valid task number
-     */
-    private static int getTaskIndex(String[] parts, int taskCount, String commandName) throws BobException {
-        if (parts.length != 2) {
-            throw new BobException("Please use the format: " + commandName + " <task number>.");
-        }
-
-        try {
-            int taskNumber = Integer.parseInt(parts[1]);
-
-            if (taskNumber < 1 || taskNumber > taskCount) {
-                throw new BobException("That task number does not exist.");
-            }
-
-            return taskNumber - 1;
-        } catch (NumberFormatException e) {
-            throw new BobException("Please enter a valid task number.");
-        }
-    }
-
-    /**
      * Creates a task from a todo, deadline, or event command.
      * Date and time details are parsed by the deadline and event task classes.
      *
@@ -165,7 +138,7 @@ public class Bob {
      * @param taskList tasks to search
      * @param days number of days after today to include
      */
-    private static ArrayList<Task> getUpcomingTasks(ArrayList<Task> taskList, int days) {
+    private static ArrayList<Task> getUpcomingTasks(TaskList taskList, int days) {
         LocalDate today = LocalDate.now();
         LocalDate endDate = today.plusDays(days);
         return taskList.stream()
@@ -180,7 +153,7 @@ public class Bob {
      * @param taskList tasks to search
      * @param date date to search for
      */
-    private static ArrayList<Task> getTasksOnDate(ArrayList<Task> taskList, LocalDate date) {
+    private static ArrayList<Task> getTasksOnDate(TaskList taskList, LocalDate date) {
         return taskList.stream()
                 .filter(task -> isOnDate(task, date))
                 .sorted(Comparator.comparing(Bob::getTaskDateTime))
@@ -224,7 +197,7 @@ public class Bob {
      *
      * @param taskList tasks to search
      */
-    private static ArrayList<Task> getOverdueTasks(ArrayList<Task> taskList) {
+    private static ArrayList<Task> getOverdueTasks(TaskList taskList) {
         LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
         return taskList.stream()
@@ -288,11 +261,11 @@ public class Bob {
         Ui ui = new Ui();
         ui.showWelcome();
 
-        ArrayList<Task> taskList;
+        TaskList taskList;
         try {
-            taskList = new ArrayList<>(Storage.loadTasks());
+            taskList = new TaskList(Storage.loadTasks());
         } catch (StorageException e) {
-            taskList = new ArrayList<>();
+            taskList = new TaskList();
             ui.showStorageError("I couldn't load the saved tasks. Starting with an empty list.");
         }
 
@@ -303,7 +276,7 @@ public class Bob {
                 ui.showGoodbye();
                 break;
             } else if (input.equals("list")) {
-                ui.showTaskList(taskList);
+                ui.showTaskList(taskList.asList());
             } else if (input.equals("upcoming") || input.startsWith("upcoming ")) {
                 try {
                     int days = getUpcomingDays(input);
@@ -328,7 +301,7 @@ public class Bob {
                 String[] parts = input.trim().split("\\s+");
                 int index;
                 try {
-                    index = getTaskIndex(parts, taskList.size(), "mark");
+                    index = taskList.getIndex(parts, "mark");
                 } catch (BobException e) {
                     ui.showError(e);
                     continue;
@@ -343,7 +316,7 @@ public class Bob {
                 String[] parts = input.split("\\s+");
                 int index;
                 try {
-                    index = getTaskIndex(parts, taskList.size(), "unmark");
+                    index = taskList.getIndex(parts, "unmark");
                 } catch (BobException e) {
                     ui.showError(e);
                     continue;
@@ -358,7 +331,7 @@ public class Bob {
                 String[] parts = input.split("\\s+");
                 int index;
                 try {
-                    index = getTaskIndex(parts, taskList.size(), "delete");
+                    index = taskList.getIndex(parts, "delete");
                 } catch (BobException e) {
                     ui.showError(e);
                     continue;
@@ -391,9 +364,9 @@ public class Bob {
      * @param taskList current task list to save
      * @param ui user interface used to report a storage problem
      */
-    private static void saveTasks(ArrayList<Task> taskList, Ui ui) {
+    private static void saveTasks(TaskList taskList, Ui ui) {
         try {
-            Storage.saveTasks(taskList);
+            Storage.saveTasks(taskList.asList());
         } catch (StorageException e) {
             ui.showStorageError("I couldn't save the task list.");
         }
