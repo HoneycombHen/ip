@@ -2,8 +2,11 @@ package student.project.bob.model;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import student.project.bob.exception.BobException;
@@ -13,6 +16,80 @@ import student.project.bob.exception.BobException;
  */
 public class TaskListTest {
     private static final String COMMAND_NAME = "mark";
+
+    /**
+     * Verifies that constructing a task list copies the supplied list.
+     */
+    @Test
+    public void constructor_withTasks_copiesInputList() {
+        List<Task> source = new ArrayList<>(List.of(new Todo("first"), new Todo("second")));
+        TaskList taskList = new TaskList(source);
+
+        source.add(new Todo("third"));
+
+        assertEquals(2, taskList.size());
+        assertSame(source.get(0), taskList.get(0));
+        assertSame(source.get(1), taskList.get(1));
+    }
+
+    /**
+     * Verifies that adding and removing tasks updates the list and returns the removed task.
+     */
+    @Test
+    public void addAndRemove_tasks_updatesSizeAndContents() {
+        TaskList taskList = new TaskList();
+        Task first = new Todo("first");
+        Task second = new Todo("second");
+
+        taskList.add(first);
+        taskList.add(second);
+
+        assertEquals(2, taskList.size());
+        assertSame(first, taskList.get(0));
+        assertSame(second, taskList.get(1));
+        assertSame(first, taskList.remove(0));
+        assertEquals(1, taskList.size());
+        assertSame(second, taskList.get(0));
+    }
+
+    /**
+     * Verifies that retrieving or removing an invalid index is rejected.
+     */
+    @Test
+    public void getAndRemove_invalidIndex_throwsIndexOutOfBoundsException() {
+        TaskList taskList = new TaskList(List.of(new Todo("task")));
+
+        assertAll(
+                () -> assertThrows(IndexOutOfBoundsException.class, () -> taskList.get(-1)),
+                () -> assertThrows(IndexOutOfBoundsException.class, () -> taskList.get(1)),
+                () -> assertThrows(IndexOutOfBoundsException.class, () -> taskList.remove(-1)),
+                () -> assertThrows(IndexOutOfBoundsException.class, () -> taskList.remove(1)));
+    }
+
+    /**
+     * Verifies that the exposed list is read-only while preserving task order.
+     */
+    @Test
+    public void asList_tasks_returnsUnmodifiableOrderedView() {
+        List<Task> tasks = List.of(new Todo("first"), new Todo("second"));
+        TaskList taskList = new TaskList(tasks);
+
+        assertIterableEquals(tasks, taskList.asList());
+        assertThrows(
+                UnsupportedOperationException.class, () -> taskList.asList().add(new Todo("third")));
+    }
+
+    /**
+     * Verifies that streaming a task list returns all tasks in insertion order.
+     */
+    @Test
+    public void stream_tasks_returnsTasksInInsertionOrder() {
+        Task first = new Todo("first");
+        Task second = new Todo("second");
+        TaskList taskList = new TaskList(List.of(first, second));
+
+        assertIterableEquals(List.of(first, second), taskList.stream().toList());
+    }
 
     /**
      * Verifies that valid one-based task numbers are converted to zero-based indexes.
