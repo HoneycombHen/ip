@@ -41,7 +41,7 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! A todo must have a description.
+Oops! A todo needs a description. Example: "todo read a book".
 ____________________________________________________________
 Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, find, or bye.
 ____________________________________________________________
@@ -79,13 +79,13 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! A deadline needs a description and a '/by' detail.
+Oops! A deadline needs a description and a '/by' detail (in yyyy-MM-dd HH:mm / HH:mm:ss). Example: "deadline submit report /by 2019-10-15". You may add a time, such as "2019-10-15 18:00" or "2019-10-15 18:00:30".
 ____________________________________________________________
-Oops! An event needs a description followed by '/from' and '/to' details.
+Oops! An event needs a description, '/from', and '/to' details (in yyyy-MM-dd HH:mm / HH:mm:ss). Example: "event team meeting /from 2019-10-15 09:00 /to 2019-10-15 10:00".
 ____________________________________________________________
-Oops! Please use the format: mark <task number>.
+Oops! Use "mark <task number>". Example: "mark 1".
 ____________________________________________________________
-Oops! Please enter a valid task number.
+Oops! The task number must be a whole number. Example: "unmark 1".
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -138,9 +138,9 @@ Got it. I've added this task:
 [E][ ] meeting (from: Wed, Oct 16 2019 to: Thu, Oct 17 2019)
 Now you have 3 tasks in the list.
 ____________________________________________________________
-Oops! That task number does not exist.
+Oops! That task number does not exist. Use "list" to view the available task numbers.
 ____________________________________________________________
-Oops! That task number does not exist.
+Oops! That task number does not exist. Use "list" to view the available task numbers.
 ____________________________________________________________
 Here are the tasks in your list:
 
@@ -235,11 +235,11 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! Please use the format: delete <task number>.
+Oops! Use "delete <task number>". Example: "delete 1".
 ____________________________________________________________
-Oops! Please enter a valid task number.
+Oops! The task number must be a whole number. Example: "delete 1".
 ____________________________________________________________
-Oops! That task number does not exist.
+Oops! That task number does not exist. Use "list" to view the available task numbers.
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -561,9 +561,9 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! A deadline's '/by' detail must be a valid date or time.
+Oops! A deadline's '/by' detail must be valid (in yyyy-MM-dd HH:mm / HH:mm:ss). Example: "deadline submit report /by 2019-10-15 18:00".
 ____________________________________________________________
-Oops! An event's '/from' and '/to' details must be valid dates or times.
+Oops! An event's '/from' and '/to' details must be valid (in yyyy-MM-dd HH:mm / HH:mm:ss). Example: "event team meeting /from 2019-10-15 09:00 /to 2019-10-15 10:00".
 ____________________________________________________________
 Got it. I've added this task:
 
@@ -701,9 +701,9 @@ ____________________________________________________________
 Here are the upcoming tasks in the next 7 days:
 
 ____________________________________________________________
-Oops! Please enter a valid number of days.
+Oops! The number of days must be a whole number. Example: "upcoming 7".
 ____________________________________________________________
-Oops! Please enter a non-negative number of days.
+Oops! The number of days cannot be negative. Example: "upcoming 7".
 ____________________________________________________________
 Got it. I've added this task:
 
@@ -802,11 +802,11 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! Please use the format: on <date>.
+Oops! Please provide a date. Example: "on 2019-10-15".
 ____________________________________________________________
-Oops! Please enter a valid date in the format: yyyy-MM-dd.
+Oops! Please enter a valid date using yyyy-MM-dd. Example: "on 2019-10-15".
 ____________________________________________________________
-Oops! Please enter a valid date in the format: yyyy-MM-dd.
+Oops! Please enter a valid date using yyyy-MM-dd. Example: "on 2019-10-15".
 ____________________________________________________________
 Got it. I've added this task:
 
@@ -914,7 +914,7 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! Please use the format: overdue.
+Oops! The overdue command does not take any arguments. Example: "overdue".
 ____________________________________________________________
 Here are your overdue tasks:
 
@@ -1014,7 +1014,7 @@ ____________________________________________________________
 Hello! I'm Bob.
 What can I do for you?
 ____________________________________________________________
-Oops! Please use the format: find <keyword>.
+Oops! Please provide a search keyword. Example: "find report".
 ____________________________________________________________
 Here are the matching tasks in your list:
 
@@ -13597,3 +13597,115 @@ ____________________________________________________________
 **Overall result:** PASS — all 21 documented UI cases passed.
 
 Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260902-seedu-final-javadoc`
+
+### Test session: 2026-09-02 03:18:36 +08:00
+
+**Build command:** `gradlew.bat classes` — passed with no compiler output.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The command was run in a fresh isolated directory for each test case. Each case used the exact inputs listed in its corresponding test-case section above. Actual stdout matched the corresponding expected output exactly after the documented trailing-space normalization; stderr was empty and every process exited with code 0.
+
+| Test case | Input result | Output result |
+| --- | --- | --- |
+| UI-001 | Exact input stream | PASS |
+| UI-002 | Exact input stream | PASS |
+| UI-003 | Exact input stream | PASS |
+| UI-004 | Exact input stream | PASS |
+| UI-005 | Exact input stream | PASS |
+| UI-006 | Exact input stream; saved-file check passed | PASS |
+| UI-007 | Exact input stream; saved-file check passed | PASS |
+| UI-008 | Exact input stream | PASS |
+| UI-009 | Exact input stream | PASS |
+| UI-010 | Exact input stream | PASS |
+| UI-011 | Exact input stream | PASS |
+| UI-012 | Exact input stream | PASS |
+| UI-013 | Exact input stream | PASS |
+| UI-014 | Exact input stream | PASS |
+| UI-015 | Exact input stream | PASS |
+| UI-016 | Exact input stream | PASS |
+| UI-017 | Exact input stream | PASS |
+| UI-018 | Exact input stream | PASS |
+| UI-019 | Exact input stream | PASS |
+| UI-020 | Exact input stream | PASS |
+| UI-021 | Exact input stream | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260902-branch-repair-rerun`
+
+### Test session: 2026-09-04 17:34:41 +08:00
+
+**Build command:** `gradlew.bat --no-daemon classes` — passed with no compiler errors.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The 21 documented cases were run in order in fresh isolated directories. Each case used the exact documented input stream and fixture, and actual stdout was compared with the expected output after removing trailing spaces from each line. Stderr was empty and every process exited with code 0.
+
+| Test case | Input result | Output result |
+| --- | --- | --- |
+| UI-001 | Exact input stream | PASS |
+| UI-002 | Exact input stream | PASS |
+| UI-003 | Exact input stream | PASS |
+| UI-004 | Exact input stream | PASS |
+| UI-005 | Exact input stream | PASS |
+| UI-006 | Exact input stream; saved-file check passed | PASS |
+| UI-007 | Exact input stream; saved-file fixture passed | PASS |
+| UI-008 | Exact input stream; missing-file fixture passed | PASS |
+| UI-009 | Exact input stream; malformed-file fixture passed | PASS |
+| UI-010 | Exact input stream; save-failure fixture passed | PASS |
+| UI-011 | Exact input stream | PASS |
+| UI-012 | Exact input stream | PASS |
+| UI-013 | Exact input stream; invalid-date fixture passed | PASS |
+| UI-014 | Exact input stream | PASS |
+| UI-015 | Exact input stream | PASS |
+| UI-016 | Exact input stream | PASS |
+| UI-017 | Exact input stream | PASS |
+| UI-018 | Exact input stream | PASS |
+| UI-019 | Exact input stream | PASS |
+| UI-020 | Exact input stream | PASS |
+| UI-021 | Exact input stream | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspaces: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-javafx-integration-0b604114a91644ecb036ba3211c9bf52` (UI-001 to UI-012) and `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-javafx-integration-continued-4bd9d4cc83f245dd91a2b8f098318a13` (UI-013 to UI-021)
+
+### Test session: 2026-09-04 17:41:56 +08:00
+
+**Build command:** `gradlew.bat --no-daemon check` — passed.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The 21 documented cases were re-run in order against the final compiled classes in fresh isolated directories. Each case used the exact documented input stream and fixture; actual stdout matched expected output after the documented trailing-space normalization, stderr was empty, and all processes exited with code 0.
+
+| Test case | Input result | Output result |
+| --- | --- | --- |
+| UI-001 to UI-005 | Exact input streams | PASS |
+| UI-006 | Exact input stream; saved-file check passed | PASS |
+| UI-007 to UI-012 | Exact input streams and documented fixtures | PASS |
+| UI-013 | Exact input stream; invalid-date fixture passed | PASS |
+| UI-014 to UI-021 | Exact input streams | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspaces: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-final-ui-8e4f975bb439492899e6e151be0087d5` (UI-001 to UI-012) and `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-final-ui-continued-f9462701eae149c1bb879988df4628a0` (UI-013 to UI-021)
+
+### Test session: 2026-09-04 18:18:59 +08:00
+
+**Build command:** `gradlew.bat --no-daemon check` — passed.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The 21 documented cases were run in order against the updated error messages in fresh isolated directories. Each case used the exact documented input stream and fixture; actual stdout matched expected output after the documented trailing-space normalization, stderr was empty, and all processes exited with code 0.
+
+| Test case | Input result | Output result |
+| --- | --- | --- |
+| UI-001 to UI-005 | Exact input streams | PASS |
+| UI-006 | Exact input stream; saved-file check passed | PASS |
+| UI-007 to UI-012 | Exact input streams and documented fixtures | PASS |
+| UI-013 | Exact input stream; invalid-date fixture passed | PASS |
+| UI-014 to UI-021 | Exact input streams | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspaces: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-error-messages-c9fe042435a24fb49038a282299fcb46` (UI-001 to UI-012) and `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-error-messages-continued-55dbdcfc5add4b9db5d4f27f20025650` (UI-013 to UI-021)

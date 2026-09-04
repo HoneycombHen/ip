@@ -78,7 +78,7 @@ public class Parser {
                     ? ""
                     : input.substring("todo ".length()).trim();
             if (description.isEmpty()) {
-                throw new BobException("A todo must have a description.");
+                throw new BobException("A todo needs a description. Example: \"todo read a book\".");
             }
             return new Todo(description);
         }
@@ -92,13 +92,17 @@ public class Parser {
             if (parts.length != 2
                     || parts[0].trim().isEmpty()
                     || parts[1].trim().isEmpty()) {
-                throw new BobException("A deadline needs a description and a '/by' detail.");
+                throw new BobException(
+                        "A deadline needs a description and a '/by' detail (in yyyy-MM-dd HH:mm / HH:mm:ss). "
+                                + "Example: \"deadline submit report /by 2019-10-15\". You may add a time, such as "
+                                + "\"2019-10-15 18:00\" or \"2019-10-15 18:00:30\".");
             }
 
             try {
                 return new Deadline(parts[0].trim(), parts[1].trim());
             } catch (DateTimeParseException e) {
-                throw new BobException("A deadline's '/by' detail must be a valid date or time.");
+                throw new BobException("A deadline's '/by' detail must be valid (in yyyy-MM-dd HH:mm / HH:mm:ss). "
+                        + "Example: \"deadline submit report /by 2019-10-15 18:00\".");
             }
         }
 
@@ -110,7 +114,9 @@ public class Parser {
             int toIndex = fromIndex < 0 ? -1 : content.indexOf("/to", fromIndex + "/from".length());
 
             if (fromIndex <= 0 || toIndex <= fromIndex + "/from".length()) {
-                throw new BobException("An event needs a description followed by '/from' and '/to' details.");
+                throw new BobException("An event needs a description, '/from', and '/to' details "
+                        + "(in yyyy-MM-dd HH:mm / HH:mm:ss). Example: \"event team meeting /from "
+                        + "2019-10-15 09:00 /to 2019-10-15 10:00\".");
             }
 
             String description = content.substring(0, fromIndex).trim();
@@ -119,13 +125,17 @@ public class Parser {
             String to = content.substring(toIndex + "/to".length()).trim();
 
             if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                throw new BobException("Event description, '/from', and '/to' details are required.");
+                throw new BobException("Please provide the event description, '/from' date/time, and '/to' date/time "
+                        + "(in yyyy-MM-dd HH:mm / HH:mm:ss). Example: \"event team meeting /from "
+                        + "2019-10-15 /to 2019-10-16\".");
             }
 
             try {
                 return new Event(description, from, to);
             } catch (DateTimeParseException e) {
-                throw new BobException("An event's '/from' and '/to' details must be valid dates or times.");
+                throw new BobException("An event's '/from' and '/to' details must be valid "
+                        + "(in yyyy-MM-dd HH:mm / HH:mm:ss). Example: \"event team meeting /from "
+                        + "2019-10-15 09:00 /to 2019-10-15 10:00\".");
             }
         }
 
@@ -145,17 +155,18 @@ public class Parser {
             return 7;
         }
         if (parts.length != 2) {
-            throw new BobException("Please use the format: upcoming [number of days].");
+            throw new BobException(
+                    "Use \"upcoming\" or \"upcoming <number of days>\". Examples: \"upcoming\" or \"upcoming 7\".");
         }
 
         try {
             int days = Integer.parseInt(parts[1]);
             if (days < 0) {
-                throw new BobException("Please enter a non-negative number of days.");
+                throw new BobException("The number of days cannot be negative. Example: \"upcoming 7\".");
             }
             return days;
         } catch (NumberFormatException e) {
-            throw new BobException("Please enter a valid number of days.");
+            throw new BobException("The number of days must be a whole number. Example: \"upcoming 7\".");
         }
     }
 
@@ -171,7 +182,7 @@ public class Parser {
                 ? ""
                 : input.substring("on".length()).trim();
         if (dateInput.isEmpty()) {
-            throw new BobException("Please use the format: on <date>.");
+            throw new BobException("Please provide a date. Example: \"on 2019-10-15\".");
         }
 
         try {
@@ -182,7 +193,7 @@ public class Parser {
         } catch (DateTimeParseException e) {
             // Report the invalid date using Bob's normal input-error flow.
         }
-        throw new BobException("Please enter a valid date in the format: yyyy-MM-dd.");
+        throw new BobException("Please enter a valid date using yyyy-MM-dd. Example: \"on 2019-10-15\".");
     }
 
     /**
@@ -197,7 +208,7 @@ public class Parser {
                 ? ""
                 : input.substring("find".length()).trim();
         if (keyword.isEmpty()) {
-            throw new BobException("Please use the format: find <keyword>.");
+            throw new BobException("Please provide a search keyword. Example: \"find report\".");
         }
         return keyword;
     }

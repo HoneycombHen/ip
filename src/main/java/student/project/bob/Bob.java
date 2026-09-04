@@ -16,11 +16,161 @@ import student.project.bob.parser.Parser;
 import student.project.bob.storage.Storage;
 import student.project.bob.storage.StorageException;
 import student.project.bob.ui.Ui;
+import student.project.bob.util.DateTimeParser;
 
 /**
  * Runs the Bob task-management application.
  */
 public class Bob {
+    private final Parser parser;
+    private final TaskList taskList;
+
+    /**
+     * Creates Bob with tasks loaded from local storage for GUI use.
+     *
+     * <p>The command-line entry point keeps its existing startup error message, while the GUI starts with an empty
+     * list when saved data cannot be loaded.
+     */
+    public Bob() {
+        parser = new Parser();
+        TaskList loadedTaskList;
+        try {
+            loadedTaskList = new TaskList(Storage.loadTasks());
+        } catch (StorageException e) {
+            loadedTaskList = new TaskList();
+        }
+        taskList = loadedTaskList;
+    }
+
+    /**
+     * Processes one command and returns the corresponding GUI response.
+     *
+     * @param input command entered by the user
+     * @return response text to display in the GUI
+     */
+    public String getResponse(String input) {
+        String commandInput = input.trim();
+        Command command;
+        try {
+            command = parser.parseCommand(commandInput);
+        } catch (BobException e) {
+            return "Oops! " + e.getMessage();
+        }
+
+        try {
+            return switch (command.getType()) {
+                case BYE -> "Bye. Hope to see you again soon!";
+                case LIST -> formatTaskList("Here are the tasks in your list:", taskList.asList());
+                case UPCOMING -> {
+                    int days = parser.parseUpcomingDays(commandInput);
+                    yield formatTaskList(
+                            "Here are the upcoming tasks in the next " + days + " days:",
+                            getUpcomingTasks(taskList, days));
+                }
+                case ON -> {
+                    LocalDate date = parser.parseOnDate(commandInput);
+                    yield formatTaskList(
+                            "Here are the tasks on " + DateTimeParser.format(date) + ":",
+                            getTasksOnDate(taskList, date));
+                }
+                case OVERDUE -> {
+                    if (!commandInput.equals("overdue")) {
+                        yield "Oops! Please use the format: overdue.";
+                    }
+                    yield formatTaskList("Here are your overdue tasks:", getOverdueTasks(taskList));
+                }
+                case FIND ->
+                    formatTaskList(
+                            "Here are the matching tasks in your list:",
+                            getMatchingTasks(taskList, parser.parseFindKeyword(commandInput)));
+                case MARK -> updateTask(commandInput, true);
+                case UNMARK -> updateTask(commandInput, false);
+                case DELETE -> deleteTask(commandInput);
+                case TASK -> addTask(commandInput);
+            };
+        } catch (BobException e) {
+            return "Oops! " + e.getMessage();
+        }
+    }
+
+    /**
+     * Formats a heading and tasks for display in a dialog box.
+     *
+     * @param heading heading to display
+     * @param tasks tasks to list
+     * @return formatted task-list response
+     */
+    private String formatTaskList(String heading, Iterable<Task> tasks) {
+        StringBuilder response = new StringBuilder(heading).append("\n\n");
+        int taskNumber = 1;
+        for (Task task : tasks) {
+            response.append(taskNumber++).append('.').append(task).append('\n');
+        }
+        return response.toString().stripTrailing();
+    }
+
+    /**
+     * Marks or unmarks a task selected by its one-based number.
+     *
+     * @param input mark or unmark command
+     * @param isMarking whether the task should be marked done
+     * @return confirmation or validation response
+     * @throws BobException if the task number is invalid
+     */
+    private String updateTask(String input, boolean isMarking) throws BobException {
+        String commandName = isMarking ? "mark" : "unmark";
+        int index = taskList.getIndex(input.split("\\s+"), commandName);
+        Task task = taskList.get(index);
+        if (isMarking) {
+            task.setDone();
+            saveGuiTasks();
+            return "Nice! I've marked this task as done:\n  [X] " + task.getDescription();
+        }
+
+        task.setUndone();
+        saveGuiTasks();
+        return "OK, I've marked this task as not done yet:\n  [ ] " + task.getDescription();
+    }
+
+    /**
+     * Deletes a task selected by its one-based number.
+     *
+     * @param input delete command
+     * @return confirmation or validation response
+     * @throws BobException if the task number is invalid
+     */
+    private String deleteTask(String input) throws BobException {
+        int index = taskList.getIndex(input.split("\\s+"), "delete");
+        Task removedTask = taskList.remove(index);
+        saveGuiTasks();
+        return "Noted. I've removed this task:\n    " + removedTask + "\nNow you have " + taskList.size()
+                + " tasks in the list.";
+    }
+
+    /**
+     * Adds a task parsed from a command.
+     *
+     * @param input task command
+     * @return confirmation or validation response
+     * @throws BobException if the task command is invalid
+     */
+    private String addTask(String input) throws BobException {
+        Task task = parser.parseTask(input);
+        taskList.add(task);
+        saveGuiTasks();
+        return "Got it. I've added this task:\n\n" + task + "\nNow you have " + taskList.size() + " tasks in the list.";
+    }
+
+    /**
+     * Saves the GUI task list and continues when persistence is unavailable.
+     */
+    private void saveGuiTasks() {
+        try {
+            Storage.saveTasks(taskList.asList());
+        } catch (StorageException e) {
+            // The GUI can continue operating even if persistence is temporarily unavailable.
+        }
+    }
 
     /**
      * Selects tasks whose relevant date falls within the upcoming date range.
@@ -216,7 +366,8 @@ public class Bob {
                     if (command.getInput().equals("overdue")) {
                         ui.showOverdueTasks(getOverdueTasks(taskList));
                     } else {
-                        ui.showError(new BobException("Please use the format: overdue."));
+                        ui.showError(new BobException(
+                                "The overdue command does not take any arguments. Example: \"overdue\"."));
                     }
                 }
                 case FIND -> {

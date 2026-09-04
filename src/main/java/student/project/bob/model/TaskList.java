@@ -76,19 +76,20 @@ public class TaskList {
      */
     public int getIndex(String[] parts, String commandName) throws BobException {
         if (parts.length != 2) {
-            throw new BobException("Please use the format: " + commandName + " <task number>.");
+            throw new BobException("Use \"" + commandName + " <task number>\". Example: \"" + commandName + " 1\".");
         }
 
         try {
             int taskNumber = Integer.parseInt(parts[1]);
 
             if (taskNumber < 1 || taskNumber > tasks.size()) {
-                throw new BobException("That task number does not exist.");
+                throw new BobException(
+                        "That task number does not exist. Use \"list\" to view the available task numbers.");
             }
 
             return taskNumber - 1;
         } catch (NumberFormatException e) {
-            throw new BobException("Please enter a valid task number.");
+            throw new BobException("The task number must be a whole number. Example: \"" + commandName + " 1\".");
         }
     }
 

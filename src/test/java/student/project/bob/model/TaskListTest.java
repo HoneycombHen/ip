@@ -110,7 +110,7 @@ public class TaskListTest {
     @Test
     public void getIndex_missingOrExtraTaskNumber_throwsFormatException() {
         TaskList taskList = new TaskList(List.of(new Todo("task")));
-        String expectedMessage = "Please use the format: mark <task number>.";
+        String expectedMessage = "Use \"mark <task number>\". Example: \"mark 1\".";
 
         assertAll(
                 () -> assertEquals(
@@ -134,7 +134,7 @@ public class TaskListTest {
     @Test
     public void getIndex_nonNumericTaskNumber_throwsInvalidNumberException() {
         TaskList taskList = new TaskList(List.of(new Todo("task")));
-        String expectedMessage = "Please enter a valid task number.";
+        String expectedMessage = "The task number must be a whole number. Example: \"mark 1\".";
 
         assertAll(
                 () -> assertEquals(
@@ -158,7 +158,7 @@ public class TaskListTest {
     @Test
     public void getIndex_outOfRangeTaskNumber_throwsTaskNotFoundException() {
         TaskList taskList = new TaskList(List.of(new Todo("first"), new Todo("second")));
-        String expectedMessage = "That task number does not exist.";
+        String expectedMessage = "That task number does not exist. Use \"list\" to view the available task numbers.";
 
         assertAll(
                 () -> assertEquals(
@@ -191,6 +191,8 @@ public class TaskListTest {
         BobException exception = assertThrows(
                 BobException.class, () -> taskList.getIndex(new String[] {COMMAND_NAME, "1"}, COMMAND_NAME));
 
-        assertEquals("That task number does not exist.", exception.getMessage());
+        assertEquals(
+                "That task number does not exist. Use \"list\" to view the available task numbers.",
+                exception.getMessage());
     }
 }
