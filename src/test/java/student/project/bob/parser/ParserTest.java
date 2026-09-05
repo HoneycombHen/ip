@@ -97,27 +97,36 @@ public class ParserTest {
 
         assertAll(
                 () -> assertEquals(
-                        "A todo must have a description.",
+                        "A todo needs a description. Example: \"todo read a book\".",
                         assertThrows(BobException.class, () -> parser.parseTask("todo"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "A deadline needs a description and a '/by' detail.",
+                        "A deadline needs a description and a '/by' detail (in yyyy-MM-dd HH:mm / HH:mm:ss). "
+                                + "Example: \"deadline submit report /by 2019-10-15\". You may add a time, such as "
+                                + "\"2019-10-15 18:00\" or \"2019-10-15 18:00:30\".",
                         assertThrows(BobException.class, () -> parser.parseTask("deadline report"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "A deadline's '/by' detail must be a valid date or time.",
+                        "A deadline's '/by' detail must be valid (in yyyy-MM-dd HH:mm / HH:mm:ss). "
+                                + "Example: \"deadline submit report /by 2019-10-15 18:00\".",
                         assertThrows(BobException.class, () -> parser.parseTask("deadline report /by not-a-date"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "An event needs a description followed by '/from' and '/to' details.",
+                        "An event needs a description, '/from', and '/to' details "
+                                + "(in yyyy-MM-dd HH:mm / HH:mm:ss). Example: \"event team meeting /from "
+                                + "2019-10-15 09:00 /to 2019-10-15 10:00\".",
                         assertThrows(BobException.class, () -> parser.parseTask("event meeting"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "Event description, '/from', and '/to' details are required.",
+                        "Please provide the event description, '/from' date/time, and '/to' date/time "
+                                + "(in yyyy-MM-dd HH:mm / HH:mm:ss). Example: \"event team meeting /from "
+                                + "2019-10-15 /to 2019-10-16\".",
                         assertThrows(BobException.class, () -> parser.parseTask("event meeting /from 2026-01-01 /to"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "An event's '/from' and '/to' details must be valid dates or times.",
+                        "An event's '/from' and '/to' details must be valid "
+                                + "(in yyyy-MM-dd HH:mm / HH:mm:ss). Example: \"event team meeting /from "
+                                + "2019-10-15 09:00 /to 2019-10-15 10:00\".",
                         assertThrows(
                                         BobException.class,
                                         () -> parser.parseTask("event meeting /from 2026-02-30 /to 2026-03-01"))
@@ -150,15 +159,15 @@ public class ParserTest {
 
         assertAll(
                 () -> assertEquals(
-                        "Please enter a valid number of days.",
+                        "The number of days must be a whole number. Example: \"upcoming 7\".",
                         assertThrows(BobException.class, () -> parser.parseUpcomingDays("upcoming nope"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "Please enter a non-negative number of days.",
+                        "The number of days cannot be negative. Example: \"upcoming 7\".",
                         assertThrows(BobException.class, () -> parser.parseUpcomingDays("upcoming -1"))
                                 .getMessage()),
                 () -> assertEquals(
-                        "Please use the format: upcoming [number of days].",
+                        "Use \"upcoming\" or \"upcoming <number of days>\". Examples: \"upcoming\" or \"upcoming 7\".",
                         assertThrows(BobException.class, () -> parser.parseUpcomingDays("upcoming 1 2"))
                                 .getMessage()));
     }
@@ -179,11 +188,11 @@ public class ParserTest {
     @Test
     public void parseOnDate_invalidArguments_throwsBobException() {
         Parser parser = new Parser();
-        String invalidDateMessage = "Please enter a valid date in the format: yyyy-MM-dd.";
+        String invalidDateMessage = "Please enter a valid date using yyyy-MM-dd. Example: \"on 2019-10-15\".";
 
         assertAll(
                 () -> assertEquals(
-                        "Please use the format: on <date>.",
+                        "Please provide a date. Example: \"on 2019-10-15\".",
                         assertThrows(BobException.class, () -> parser.parseOnDate("on"))
                                 .getMessage()),
                 () -> assertEquals(
@@ -205,7 +214,7 @@ public class ParserTest {
 
         assertEquals("book", parser.parseFindKeyword("find    book"));
         assertEquals(
-                "Please use the format: find <keyword>.",
+                "Please provide a search keyword. Example: \"find report\".",
                 assertThrows(BobException.class, () -> parser.parseFindKeyword("find"))
                         .getMessage());
     }
