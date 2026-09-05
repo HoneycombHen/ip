@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
+
 import student.project.bob.exception.BobException;
 import student.project.bob.model.Deadline;
 import student.project.bob.model.Event;
@@ -17,7 +19,8 @@ import student.project.bob.model.Todo;
  */
 public class ParserTest {
     private static final String UNKNOWN_COMMAND_MESSAGE =
-            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, find, or bye.";
+            "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, "
+                    + "overdue, find, or bye.";
 
     /**
      * Verifies that every supported command prefix is classified correctly.

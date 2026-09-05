@@ -6,6 +6,7 @@ import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Locale;
+
 import student.project.bob.exception.BobException;
 import student.project.bob.model.Deadline;
 import student.project.bob.model.Event;
@@ -438,6 +439,7 @@ public class Bob {
                     saveTasks(taskList, ui);
                     ui.showAddedTask(newTask, taskList.size());
                 }
+                default -> throw new AssertionError("Unhandled command type: " + command.getType());
             }
         }
     }
