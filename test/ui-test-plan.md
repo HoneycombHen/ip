@@ -13709,3 +13709,43 @@ The 21 documented cases were run in order against the updated error messages in 
 **Overall result:** PASS — all 21 documented UI cases passed.
 
 Session workspaces: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-error-messages-c9fe042435a24fb49038a282299fcb46` (UI-001 to UI-012) and `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260904-error-messages-continued-55dbdcfc5add4b9db5d4f27f20025650` (UI-013 to UI-021)
+
+### Test session: 2026-09-05 22:25:02 +08:00
+
+**Build command:** `gradlew.bat classes` — passed with no compiler errors.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The 21 documented cases were run in order in fresh isolated directories under
+`_temp/ui-session-20260905-checkstyle`. Each case used the exact documented
+input stream and fixture. Actual stdout matched the expected output after
+removing trailing spaces from each line; stderr was empty and every process
+exited with code 0. The saved-file checks for UI-006 and UI-007 also passed.
+
+| Test case | Input result | Output result |
+| --- | --- | --- |
+| UI-001 | Exact input stream | PASS |
+| UI-002 | Exact input stream | PASS |
+| UI-003 | Exact input stream | PASS |
+| UI-004 | Exact input stream | PASS |
+| UI-005 | Exact input stream | PASS |
+| UI-006 | Exact input stream; saved-file check passed | PASS |
+| UI-007 | Exact input stream; saved-file fixture passed | PASS |
+| UI-008 | Exact input stream; missing-file fixture passed | PASS |
+| UI-009 | Exact input stream; malformed-file fixture passed | PASS |
+| UI-010 | Exact input stream; save-failure fixture passed | PASS |
+| UI-011 | Exact input stream | PASS |
+| UI-012 | Exact input stream | PASS |
+| UI-013 | Exact input stream; invalid-date fixture passed | PASS |
+| UI-014 | Exact input stream | PASS |
+| UI-015 | Exact input stream | PASS |
+| UI-016 | Exact input stream | PASS |
+| UI-017 | Exact input stream | PASS |
+| UI-018 | Exact input stream | PASS |
+| UI-019 | Exact input stream | PASS |
+| UI-020 | Exact input stream | PASS |
+| UI-021 | Exact input stream | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260905-checkstyle`
