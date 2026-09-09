@@ -29,11 +29,7 @@ public class Storage {
     public static List<Task> loadTasks() throws StorageException {
         try {
             List<String> taskLines = Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8);
-            List<Task> tasks = new ArrayList<>();
-            for (String taskLine : taskLines) {
-                tasks.add(parseTask(taskLine));
-            }
-            return tasks;
+            return taskLines.stream().map(Storage::parseTask).collect(Collectors.toList());
         } catch (NoSuchFileException e) {
             return new ArrayList<>();
         } catch (IOException | RuntimeException e) {
