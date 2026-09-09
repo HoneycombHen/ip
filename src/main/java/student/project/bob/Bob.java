@@ -341,106 +341,183 @@ public class Bob {
                 continue;
             }
 
-            switch (command.getType()) {
-                case BYE -> {
-                    ui.showGoodbye();
-                    return;
-                }
-                case LIST -> ui.showTaskList(taskList.asList());
-                case UPCOMING -> {
-                    try {
-                        int days = parser.parseUpcomingDays(command.getInput());
-                        ui.showUpcomingTasks(getUpcomingTasks(taskList, days), days);
-                    } catch (BobException e) {
-                        ui.showError(e);
-                    }
-                }
-                case ON -> {
-                    try {
-                        LocalDate date = parser.parseOnDate(command.getInput());
-                        ui.showTasksOnDate(getTasksOnDate(taskList, date), date);
-                    } catch (BobException e) {
-                        ui.showError(e);
-                    }
-                }
-                case OVERDUE -> {
-                    if (command.getInput().equals("overdue")) {
-                        ui.showOverdueTasks(getOverdueTasks(taskList));
-                    } else {
-                        ui.showError(new BobException(
-                                "The overdue command does not take any arguments. Example: \"overdue\"."));
-                    }
-                }
-                case FIND -> {
-                    try {
-                        String keyword = parser.parseFindKeyword(command.getInput());
-                        ui.showMatchingTasks(getMatchingTasks(taskList, keyword));
-                    } catch (BobException e) {
-                        ui.showError(e);
-                    }
-                }
-                case MARK -> {
-                    String[] parts = command.getInput().trim().split("\\s+");
-                    int index;
-                    try {
-                        index = taskList.getIndex(parts, "mark");
-                    } catch (BobException e) {
-                        ui.showError(e);
-                        continue;
-                    }
-
-                    Task task = taskList.get(index);
-                    task.setDone();
-                    saveTasks(taskList, ui);
-
-                    ui.showMarkedTask(task);
-                }
-                case UNMARK -> {
-                    String[] parts = command.getInput().split("\\s+");
-                    int index;
-                    try {
-                        index = taskList.getIndex(parts, "unmark");
-                    } catch (BobException e) {
-                        ui.showError(e);
-                        continue;
-                    }
-
-                    Task task = taskList.get(index);
-                    ui.showUnmarkedTask(task);
-                    task.setUndone();
-                    saveTasks(taskList, ui);
-                    ui.showSeparator();
-                }
-                case DELETE -> {
-                    String[] parts = command.getInput().split("\\s+");
-                    int index;
-                    try {
-                        index = taskList.getIndex(parts, "delete");
-                    } catch (BobException e) {
-                        ui.showError(e);
-                        continue;
-                    }
-
-                    Task removedTask = taskList.remove(index);
-                    saveTasks(taskList, ui);
-
-                    ui.showDeletedTask(removedTask, taskList.size());
-                }
-                case TASK -> {
-                    Task newTask;
-                    try {
-                        newTask = parser.parseTask(command.getInput());
-                    } catch (BobException e) {
-                        ui.showError(e);
-                        continue;
-                    }
-
-                    taskList.add(newTask);
-                    saveTasks(taskList, ui);
-                    ui.showAddedTask(newTask, taskList.size());
-                }
-                default -> throw new AssertionError("Unhandled command type: " + command.getType());
+            if (processCommand(command, parser, taskList, ui)) {
+                return;
             }
+        }
+    }
+
+    /**
+     * Executes one parsed command and reports whether Bob should exit.
+     *
+     * @param command parsed command to execute
+     * @param parser parser used for command-specific arguments
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     * @return true if the command requests that Bob exits
+     */
+    private static boolean processCommand(Command command, Parser parser, TaskList taskList, Ui ui) {
+        switch (command.getType()) {
+            case BYE -> {
+                ui.showGoodbye();
+                return true;
+            }
+            case LIST -> ui.showTaskList(taskList.asList());
+            case UPCOMING -> showUpcomingTasks(command, parser, taskList, ui);
+            case ON -> showTasksOnDate(command, parser, taskList, ui);
+            case OVERDUE -> showOverdueTasks(command, taskList, ui);
+            case FIND -> showMatchingTasks(command, parser, taskList, ui);
+            case MARK -> markTask(command, taskList, ui);
+            case UNMARK -> unmarkTask(command, taskList, ui);
+            case DELETE -> deleteTask(command, taskList, ui);
+            case TASK -> addTask(command, parser, taskList, ui);
+            default -> throw new AssertionError("Unhandled command type: " + command.getType());
+        }
+        return false;
+    }
+
+    /**
+     * Displays tasks scheduled in the upcoming date range.
+     *
+     * @param command parsed upcoming command
+     * @param parser parser used to read the number of days
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void showUpcomingTasks(Command command, Parser parser, TaskList taskList, Ui ui) {
+        try {
+            int days = parser.parseUpcomingDays(command.getInput());
+            ui.showUpcomingTasks(getUpcomingTasks(taskList, days), days);
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Displays deadlines and events scheduled on a requested date.
+     *
+     * @param command parsed on command
+     * @param parser parser used to read the requested date
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void showTasksOnDate(Command command, Parser parser, TaskList taskList, Ui ui) {
+        try {
+            LocalDate date = parser.parseOnDate(command.getInput());
+            ui.showTasksOnDate(getTasksOnDate(taskList, date), date);
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Displays incomplete deadlines that are past their due date or time.
+     *
+     * @param command parsed overdue command
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void showOverdueTasks(Command command, TaskList taskList, Ui ui) {
+        if (command.getInput().equals("overdue")) {
+            ui.showOverdueTasks(getOverdueTasks(taskList));
+        } else {
+            ui.showError(new BobException("The overdue command does not take any arguments. Example: \"overdue\"."));
+        }
+    }
+
+    /**
+     * Displays tasks whose descriptions match a search keyword.
+     *
+     * @param command parsed find command
+     * @param parser parser used to read the search keyword
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void showMatchingTasks(Command command, Parser parser, TaskList taskList, Ui ui) {
+        try {
+            String keyword = parser.parseFindKeyword(command.getInput());
+            ui.showMatchingTasks(getMatchingTasks(taskList, keyword));
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Marks a selected task as done.
+     *
+     * @param command parsed mark command
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void markTask(Command command, TaskList taskList, Ui ui) {
+        try {
+            String[] parts = command.getInput().trim().split("\\s+");
+            int index = taskList.getIndex(parts, "mark");
+            Task task = taskList.get(index);
+            task.setDone();
+            saveTasks(taskList, ui);
+            ui.showMarkedTask(task);
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Marks a selected task as not done.
+     *
+     * @param command parsed unmark command
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void unmarkTask(Command command, TaskList taskList, Ui ui) {
+        try {
+            String[] parts = command.getInput().split("\\s+");
+            int index = taskList.getIndex(parts, "unmark");
+            Task task = taskList.get(index);
+            ui.showUnmarkedTask(task);
+            task.setUndone();
+            saveTasks(taskList, ui);
+            ui.showSeparator();
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Deletes a selected task.
+     *
+     * @param command parsed delete command
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void deleteTask(Command command, TaskList taskList, Ui ui) {
+        try {
+            String[] parts = command.getInput().split("\\s+");
+            int index = taskList.getIndex(parts, "delete");
+            Task removedTask = taskList.remove(index);
+            saveTasks(taskList, ui);
+            ui.showDeletedTask(removedTask, taskList.size());
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Parses and adds a new task.
+     *
+     * @param command parsed task command
+     * @param parser parser used to construct the task
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void addTask(Command command, Parser parser, TaskList taskList, Ui ui) {
+        try {
+            Task newTask = parser.parseTask(command.getInput());
+            taskList.add(newTask);
+            saveTasks(taskList, ui);
+            ui.showAddedTask(newTask, taskList.size());
+        } catch (BobException e) {
+            ui.showError(e);
         }
     }
 
