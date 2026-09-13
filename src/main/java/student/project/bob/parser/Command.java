@@ -30,6 +30,8 @@ public class Command {
      * @param input original trimmed command input
      */
     public Command(Type type, String input) {
+        assert type != null : "A command must have a recognized type";
+        assert input != null : "A command must retain its input";
         this.type = type;
         this.input = input;
     }

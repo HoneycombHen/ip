@@ -88,7 +88,9 @@ public class TaskList {
                         "That task number does not exist. Use \"list\" to view the available task numbers.");
             }
 
-            return taskNumber - 1;
+            int index = taskNumber - 1;
+            assert index >= 0 && index < tasks.size() : "A valid task number must map to a valid list index";
+            return index;
         } catch (NumberFormatException e) {
             throw new BobException("The task number must be a whole number. Example: \"" + commandName + " 1\".");
         }
