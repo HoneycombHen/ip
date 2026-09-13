@@ -27,6 +27,7 @@ import student.project.bob.model.Todo;
 public class StorageTest {
     @TempDir
     private Path temporaryDirectory;
+
     private String dataFilePath = Path.of("data", "Bob.txt").toString();
 
     /**
@@ -61,8 +62,7 @@ public class StorageTest {
     public void loadTasks_malformedFile_throwsStorageException() throws Exception {
         String output = runStorageProbe("malformedFile");
 
-        assertTrue(output.startsWith(
-                "StorageException: Could not load tasks from " + dataFilePath + "."));
+        assertTrue(output.startsWith("StorageException: Could not load tasks from " + dataFilePath + "."));
     }
 
     /**
@@ -80,8 +80,7 @@ public class StorageTest {
     public void saveTasks_directoryAtFilePath_throwsStorageException() throws Exception {
         String output = runStorageProbe("saveFailure");
 
-        assertTrue(output.startsWith(
-                "StorageException: Could not save tasks to " + dataFilePath + "."));
+        assertTrue(output.startsWith("StorageException: Could not save tasks to " + dataFilePath + "."));
     }
 
     /**
