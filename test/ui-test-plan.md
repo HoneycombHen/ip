@@ -13749,3 +13749,43 @@ exited with code 0. The saved-file checks for UI-006 and UI-007 also passed.
 **Overall result:** PASS — all 21 documented UI cases passed.
 
 Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260905-checkstyle`
+
+### Test session: 2026-09-09 16:25:01 +08:00
+
+**Build command:** `gradlew.bat --no-daemon --console=plain check` — passed.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The 21 documented cases were run in order in fresh isolated directories under
+`_temp/ui-session-20260909-assertions-final`. Each case used the exact
+documented input stream and fixture. Actual stdout matched the corresponding
+expected output after removing trailing spaces from each line; stderr was empty
+and every process exited with code 0. The saved-file check for UI-006 passed.
+
+| Test case | Command | Input result | Actual output | Result |
+| --- | --- | --- | --- | --- |
+| UI-001 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-002 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-003 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-004 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-005 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-006 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; saved-file check passed | Matched expected output | PASS |
+| UI-007 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; saved-file fixture passed | Matched expected output | PASS |
+| UI-008 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; missing-file fixture passed | Matched expected output | PASS |
+| UI-009 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; malformed-file fixture passed | Matched expected output | PASS |
+| UI-010 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; save-failure fixture passed | Matched expected output | PASS |
+| UI-011 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-012 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-013 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; invalid-date fixture passed | Matched expected output | PASS |
+| UI-014 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-015 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-016 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-017 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-018 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-019 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-020 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-021 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260909-assertions-final`

@@ -180,6 +180,7 @@ public class Bob {
      * @param days number of days after today to include
      */
     private static ArrayList<Task> getUpcomingTasks(TaskList taskList, int days) {
+        assert days >= 0 : "The upcoming range cannot contain a negative number of days";
         LocalDate today = LocalDate.now();
         LocalDate endDate = today.plusDays(days);
         return taskList.stream()
@@ -227,6 +228,8 @@ public class Bob {
      * @return local date-time representation
      */
     private static LocalDateTime getDateTime(Temporal temporal) {
+        assert temporal instanceof LocalDate || temporal instanceof LocalDateTime
+                : "Only LocalDate and LocalDateTime values are supported";
         if (temporal instanceof LocalDateTime dateTime) {
             return dateTime;
         }
@@ -290,6 +293,7 @@ public class Bob {
      * @return true if the task's relevant date is in the range
      */
     private static boolean isUpcoming(Task task, LocalDate startDate, LocalDate endDate) {
+        assert !endDate.isBefore(startDate) : "An upcoming date range must be ordered";
         if (!(task instanceof Deadline) && !(task instanceof Event)) {
             return false;
         }
@@ -305,11 +309,9 @@ public class Bob {
      * @return the deadline date or event start date and time
      */
     private static LocalDateTime getTaskDateTime(Task task) {
+        assert task instanceof Deadline || task instanceof Event : "Only deadlines and events have a task date-time";
         Temporal temporal = task instanceof Deadline deadline ? deadline.getBy() : ((Event) task).getFrom();
-        if (temporal instanceof LocalDateTime dateTime) {
-            return dateTime;
-        }
-        return ((LocalDate) temporal).atStartOfDay();
+        return getDateTime(temporal);
     }
 
     /**
