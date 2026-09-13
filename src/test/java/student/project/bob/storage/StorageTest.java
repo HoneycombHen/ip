@@ -28,6 +28,8 @@ public class StorageTest {
     @TempDir
     private Path temporaryDirectory;
 
+    private String dataFilePath = Path.of("data", "Bob.txt").toString();
+
     /**
      * Verifies that all task types and completion states survive a storage round trip.
      */
@@ -60,7 +62,7 @@ public class StorageTest {
     public void loadTasks_malformedFile_throwsStorageException() throws Exception {
         String output = runStorageProbe("malformedFile");
 
-        assertTrue(output.startsWith("StorageException: Could not load tasks from data\\Bob.txt."));
+        assertTrue(output.startsWith("StorageException: Could not load tasks from " + dataFilePath + "."));
     }
 
     /**
@@ -78,7 +80,7 @@ public class StorageTest {
     public void saveTasks_directoryAtFilePath_throwsStorageException() throws Exception {
         String output = runStorageProbe("saveFailure");
 
-        assertTrue(output.startsWith("StorageException: Could not save tasks to data\\Bob.txt."));
+        assertTrue(output.startsWith("StorageException: Could not save tasks to " + dataFilePath + "."));
     }
 
     /**
