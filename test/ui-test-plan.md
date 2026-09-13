@@ -13750,6 +13750,27 @@ exited with code 0. The saved-file checks for UI-006 and UI-007 also passed.
 
 Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260905-checkstyle`
 
+### Test session: 2026-09-09 stream refactor
+
+**Build command:** `gradlew.bat -g .gradle-user-home spotlessCheck test` — passed with no compiler errors.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+Each documented case was executed in order in a fresh directory under
+`_temp/ui-session-20260909-stream-refactor`, using the exact console input
+listed in its test-case section. The fixture-specific cases used their
+documented saved-file fixtures. Actual stdout matched the corresponding
+expected output after removing trailing spaces from each line; stderr was
+empty and every process exited with code 0.
+
+| Test case | Command and console input | Actual output | Result |
+| --- | --- | --- | --- |
+| UI-001 to UI-021 | Exact command and inputs from each documented case | Exact match with each documented expected output | PASS |
+
+**Overall result:** PASS — all 21 documented UI cases passed.
+
+Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260909-stream-refactor`
+
 ### Test session: 2026-09-09 code-quality refactoring
 
 **Build command:** Direct javac compilation of all main sources was used because gradlew.bat classes is blocked by an AccessDeniedException on the cached JavaFX graphics JAR. spotlessCheck passed.
