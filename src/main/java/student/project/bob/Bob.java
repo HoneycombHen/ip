@@ -149,6 +149,25 @@ public class Bob {
     }
 
     /**
+     * Deletes a selected task.
+     *
+     * @param command parsed delete command
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void deleteTask(Command command, TaskList taskList, Ui ui) {
+        try {
+            String[] parts = command.getInput().split("\\s+");
+            int index = taskList.getIndex(parts, "delete");
+            Task removedTask = taskList.remove(index);
+            saveTasks(taskList, ui);
+            ui.showDeletedTask(removedTask, taskList.size());
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
      * Adds a task parsed from a command.
      *
      * @param input task command
@@ -160,6 +179,25 @@ public class Bob {
         taskList.add(task);
         saveGuiTasks();
         return "Got it. I've added this task:\n\n" + task + "\nNow you have " + taskList.size() + " tasks in the list.";
+    }
+
+    /**
+     * Parses and adds a new task.
+     *
+     * @param command parsed task command
+     * @param parser parser used to construct the task
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     */
+    private static void addTask(Command command, Parser parser, TaskList taskList, Ui ui) {
+        try {
+            Task newTask = parser.parseTask(command.getInput());
+            taskList.add(newTask);
+            saveTasks(taskList, ui);
+            ui.showAddedTask(newTask, taskList.size());
+        } catch (BobException e) {
+            ui.showError(e);
+        }
     }
 
     /**
@@ -480,44 +518,6 @@ public class Bob {
             task.setUndone();
             saveTasks(taskList, ui);
             ui.showSeparator();
-        } catch (BobException e) {
-            ui.showError(e);
-        }
-    }
-
-    /**
-     * Deletes a selected task.
-     *
-     * @param command parsed delete command
-     * @param taskList current task list
-     * @param ui user interface used for console output
-     */
-    private static void deleteTask(Command command, TaskList taskList, Ui ui) {
-        try {
-            String[] parts = command.getInput().split("\\s+");
-            int index = taskList.getIndex(parts, "delete");
-            Task removedTask = taskList.remove(index);
-            saveTasks(taskList, ui);
-            ui.showDeletedTask(removedTask, taskList.size());
-        } catch (BobException e) {
-            ui.showError(e);
-        }
-    }
-
-    /**
-     * Parses and adds a new task.
-     *
-     * @param command parsed task command
-     * @param parser parser used to construct the task
-     * @param taskList current task list
-     * @param ui user interface used for console output
-     */
-    private static void addTask(Command command, Parser parser, TaskList taskList, Ui ui) {
-        try {
-            Task newTask = parser.parseTask(command.getInput());
-            taskList.add(newTask);
-            saveTasks(taskList, ui);
-            ui.showAddedTask(newTask, taskList.size());
         } catch (BobException e) {
             ui.showError(e);
         }
