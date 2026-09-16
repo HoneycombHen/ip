@@ -6,12 +6,14 @@ import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.Optional;
 
 import student.project.bob.exception.BobException;
 import student.project.bob.model.Deadline;
 import student.project.bob.model.Event;
 import student.project.bob.model.Task;
 import student.project.bob.model.TaskList;
+import student.project.bob.model.UndoHistory;
 import student.project.bob.parser.Command;
 import student.project.bob.parser.Parser;
 import student.project.bob.storage.Storage;
@@ -23,8 +25,13 @@ import student.project.bob.util.DateTimeParser;
  * Runs the Bob task-management application.
  */
 public class Bob {
+    private static final String UNDO_ARGUMENT_ERROR =
+            "The undo command does not take any arguments. Example: \"undo\".";
+    private static final String NO_UNDO_ERROR = "There is no command to undo.";
+
     private final Parser parser;
     private final TaskList taskList;
+    private final UndoHistory undoHistory;
 
     /**
      * Creates Bob with tasks loaded from local storage for GUI use.
@@ -41,6 +48,7 @@ public class Bob {
             loadedTaskList = new TaskList();
         }
         taskList = loadedTaskList;
+        undoHistory = new UndoHistory();
     }
 
     /**
@@ -87,6 +95,7 @@ public class Bob {
                 case MARK -> updateTask(commandInput, true);
                 case UNMARK -> updateTask(commandInput, false);
                 case DELETE -> deleteTask(commandInput);
+                case UNDO -> undo(commandInput);
                 case TASK -> addTask(commandInput);
             };
         } catch (BobException e) {
@@ -123,14 +132,73 @@ public class Bob {
         int index = taskList.getIndex(input.split("\\s+"), commandName);
         Task task = taskList.get(index);
         if (isMarking) {
+            boolean wasDone = task.isDone();
             task.setDone();
+            if (!wasDone) {
+                undoHistory.record(task::setUndone, "Undid the last command:\n  [ ] " + task.getDescription());
+            }
             saveGuiTasks();
             return "Nice! I've marked this task as done:\n  [X] " + task.getDescription();
         }
 
+        boolean wasDone = task.isDone();
         task.setUndone();
+        if (wasDone) {
+            undoHistory.record(task::setDone, "Undid the last command:\n  [X] " + task.getDescription());
+        }
         saveGuiTasks();
         return "OK, I've marked this task as not done yet:\n  [ ] " + task.getDescription();
+    }
+
+    /**
+     * Undoes the most recent state-changing command in the GUI session.
+     *
+     * @param input undo command
+     * @return confirmation or validation response
+     * @throws BobException if the command has arguments or there is no command to undo
+     */
+    private String undo(String input) throws BobException {
+        validateUndoInput(input);
+        Optional<String> message = undoHistory.undo();
+        if (message.isEmpty()) {
+            throw new BobException(NO_UNDO_ERROR);
+        }
+        saveGuiTasks();
+        return message.get();
+    }
+
+    /**
+     * Undoes the most recent state-changing command in the CLI session.
+     *
+     * @param command parsed undo command
+     * @param taskList current task list
+     * @param ui user interface used for console output
+     * @param undoHistory history of the most recent state-changing command
+     */
+    private static void undo(Command command, TaskList taskList, Ui ui, UndoHistory undoHistory) {
+        try {
+            validateUndoInput(command.getInput());
+            Optional<String> message = undoHistory.undo();
+            if (message.isEmpty()) {
+                throw new BobException(NO_UNDO_ERROR);
+            }
+            saveTasks(taskList, ui);
+            ui.showUndoResult(message.get());
+        } catch (BobException e) {
+            ui.showError(e);
+        }
+    }
+
+    /**
+     * Validates that undo has no arguments.
+     *
+     * @param input command input to validate
+     * @throws BobException if the command has arguments
+     */
+    private static void validateUndoInput(String input) throws BobException {
+        if (!input.equals("undo")) {
+            throw new BobException(UNDO_ARGUMENT_ERROR);
+        }
     }
 
     /**
@@ -143,6 +211,7 @@ public class Bob {
     private String deleteTask(String input) throws BobException {
         int index = taskList.getIndex(input.split("\\s+"), "delete");
         Task removedTask = taskList.remove(index);
+        undoHistory.record(() -> taskList.add(index, removedTask), "Undid the last command:\n    " + removedTask);
         saveGuiTasks();
         return "Noted. I've removed this task:\n    " + removedTask + "\nNow you have " + taskList.size()
                 + " tasks in the list.";
@@ -154,12 +223,14 @@ public class Bob {
      * @param command parsed delete command
      * @param taskList current task list
      * @param ui user interface used for console output
+     * @param undoHistory history of the most recent state-changing command
      */
-    private static void deleteTask(Command command, TaskList taskList, Ui ui) {
+    private static void deleteTask(Command command, TaskList taskList, Ui ui, UndoHistory undoHistory) {
         try {
             String[] parts = command.getInput().split("\\s+");
             int index = taskList.getIndex(parts, "delete");
             Task removedTask = taskList.remove(index);
+            undoHistory.record(() -> taskList.add(index, removedTask), "Undid the last command:\n    " + removedTask);
             saveTasks(taskList, ui);
             ui.showDeletedTask(removedTask, taskList.size());
         } catch (BobException e) {
@@ -176,7 +247,9 @@ public class Bob {
      */
     private String addTask(String input) throws BobException {
         Task task = parser.parseTask(input);
+        int index = taskList.size();
         taskList.add(task);
+        undoHistory.record(() -> taskList.remove(index), "Undid the last command:\n    " + task);
         saveGuiTasks();
         return "Got it. I've added this task:\n\n" + task + "\nNow you have " + taskList.size() + " tasks in the list.";
     }
@@ -188,11 +261,14 @@ public class Bob {
      * @param parser parser used to construct the task
      * @param taskList current task list
      * @param ui user interface used for console output
+     * @param undoHistory history of the most recent state-changing command
      */
-    private static void addTask(Command command, Parser parser, TaskList taskList, Ui ui) {
+    private static void addTask(Command command, Parser parser, TaskList taskList, Ui ui, UndoHistory undoHistory) {
         try {
             Task newTask = parser.parseTask(command.getInput());
+            int index = taskList.size();
             taskList.add(newTask);
+            undoHistory.record(() -> taskList.remove(index), "Undid the last command:\n    " + newTask);
             saveTasks(taskList, ui);
             ui.showAddedTask(newTask, taskList.size());
         } catch (BobException e) {
@@ -360,6 +436,7 @@ public class Bob {
     public static void main(String[] args) {
         Ui ui = new Ui();
         Parser parser = new Parser();
+        UndoHistory undoHistory = new UndoHistory();
         ui.showWelcome();
 
         TaskList taskList;
@@ -381,7 +458,7 @@ public class Bob {
                 continue;
             }
 
-            if (processCommand(command, parser, taskList, ui)) {
+            if (processCommand(command, parser, taskList, ui, undoHistory)) {
                 return;
             }
         }
@@ -394,9 +471,11 @@ public class Bob {
      * @param parser parser used for command-specific arguments
      * @param taskList current task list
      * @param ui user interface used for console output
+     * @param undoHistory history of the most recent state-changing command
      * @return true if the command requests that Bob exits
      */
-    private static boolean processCommand(Command command, Parser parser, TaskList taskList, Ui ui) {
+    private static boolean processCommand(
+            Command command, Parser parser, TaskList taskList, Ui ui, UndoHistory undoHistory) {
         switch (command.getType()) {
             case BYE -> {
                 ui.showGoodbye();
@@ -407,10 +486,11 @@ public class Bob {
             case ON -> showTasksOnDate(command, parser, taskList, ui);
             case OVERDUE -> showOverdueTasks(command, taskList, ui);
             case FIND -> showMatchingTasks(command, parser, taskList, ui);
-            case MARK -> markTask(command, taskList, ui);
-            case UNMARK -> unmarkTask(command, taskList, ui);
-            case DELETE -> deleteTask(command, taskList, ui);
-            case TASK -> addTask(command, parser, taskList, ui);
+            case MARK -> markTask(command, taskList, ui, undoHistory);
+            case UNMARK -> unmarkTask(command, taskList, ui, undoHistory);
+            case DELETE -> deleteTask(command, taskList, ui, undoHistory);
+            case UNDO -> undo(command, taskList, ui, undoHistory);
+            case TASK -> addTask(command, parser, taskList, ui, undoHistory);
             default -> throw new AssertionError("Unhandled command type: " + command.getType());
         }
         return false;
@@ -488,13 +568,18 @@ public class Bob {
      * @param command parsed mark command
      * @param taskList current task list
      * @param ui user interface used for console output
+     * @param undoHistory history of the most recent state-changing command
      */
-    private static void markTask(Command command, TaskList taskList, Ui ui) {
+    private static void markTask(Command command, TaskList taskList, Ui ui, UndoHistory undoHistory) {
         try {
             String[] parts = command.getInput().trim().split("\\s+");
             int index = taskList.getIndex(parts, "mark");
             Task task = taskList.get(index);
+            boolean wasDone = task.isDone();
             task.setDone();
+            if (!wasDone) {
+                undoHistory.record(task::setUndone, "Undid the last command:\n  [ ] " + task.getDescription());
+            }
             saveTasks(taskList, ui);
             ui.showMarkedTask(task);
         } catch (BobException e) {
@@ -508,14 +593,19 @@ public class Bob {
      * @param command parsed unmark command
      * @param taskList current task list
      * @param ui user interface used for console output
+     * @param undoHistory history of the most recent state-changing command
      */
-    private static void unmarkTask(Command command, TaskList taskList, Ui ui) {
+    private static void unmarkTask(Command command, TaskList taskList, Ui ui, UndoHistory undoHistory) {
         try {
             String[] parts = command.getInput().split("\\s+");
             int index = taskList.getIndex(parts, "unmark");
             Task task = taskList.get(index);
+            boolean wasDone = task.isDone();
             ui.showUnmarkedTask(task);
             task.setUndone();
+            if (wasDone) {
+                undoHistory.record(task::setDone, "Undid the last command:\n  [X] " + task.getDescription());
+            }
             saveTasks(taskList, ui);
             ui.showSeparator();
         } catch (BobException e) {

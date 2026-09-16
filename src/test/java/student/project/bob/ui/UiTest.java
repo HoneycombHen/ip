@@ -195,6 +195,20 @@ public class UiTest {
     }
 
     /**
+     * Verifies that undo output includes its message and the standard separator.
+     */
+    @Test
+    public void showUndoResult_message_printsMessageAndSeparator() {
+        ui.showUndoResult("Undid the last command:\n    [T][ ] read book");
+
+        assertEquals(
+                normalize("Undid the last command:\n"
+                        + "    [T][ ] read book\n"
+                        + "____________________________________________________________\n"),
+                outputText());
+    }
+
+    /**
      * Verifies input and storage errors use the common error prefix and separator.
      */
     @Test

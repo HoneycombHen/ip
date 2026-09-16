@@ -51,6 +51,46 @@ public class BobTest {
     }
 
     /**
+     * Verifies that undo restores task creation, completion status, and deletion position.
+     */
+    @Test
+    public void main_undoCommand_revertsMostRecentStateChange() throws Exception {
+        createDataFile("");
+
+        String output = runBob("todo first\n"
+                + "todo second\n"
+                + "delete 1\n"
+                + "undo\n"
+                + "mark 1\n"
+                + "undo\n"
+                + "list\n"
+                + "undo\n"
+                + "bye\n");
+
+        assertTrue(output.contains("Undid the last command:\n    [T][ ] first"), output);
+        assertTrue(output.contains("Undid the last command:\n  [ ] first"), output);
+        assertTrue(output.contains("Oops! There is no command to undo."), output);
+        assertTrue(output.contains("1.[T][ ] first"), output);
+        assertTrue(output.contains("2.[T][ ] second"), output);
+    }
+
+    /**
+     * Verifies that undo rejects arguments without discarding a valid undo action.
+     */
+    @Test
+    public void main_undoCommand_invalidArguments() throws Exception {
+        createDataFile("");
+
+        String output = runBob("todo first\nundo now\nundo\nlist\nbye\n");
+
+        assertTrue(output.contains("Oops! The undo command does not take any arguments."), output);
+        assertTrue(output.contains("Undid the last command:\n    [T][ ] first"), output);
+        String emptyListMessage =
+                "Here are the tasks in your list:\n\n" + "____________________________________________________________";
+        assertTrue(output.contains(emptyListMessage), output);
+    }
+
+    /**
      * Verifies that upcoming, on-date, and overdue queries select the correct task types and dates.
      */
     @Test

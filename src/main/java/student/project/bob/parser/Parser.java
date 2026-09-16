@@ -17,7 +17,7 @@ import student.project.bob.util.DateTimeParser;
 public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE =
             "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, "
-                    + "overdue, find, or bye.";
+                    + "overdue, find, undo, or bye.";
 
     /**
      * Creates a parser for Bob commands.
@@ -58,6 +58,9 @@ public class Parser {
         }
         if (input.equals("delete") || input.startsWith("delete ")) {
             return new Command(Command.Type.DELETE, input);
+        }
+        if (input.equals("undo") || input.startsWith("undo ")) {
+            return new Command(Command.Type.UNDO, input);
         }
         if (isTaskCommand(input)) {
             return new Command(Command.Type.TASK, input);
