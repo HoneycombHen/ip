@@ -58,7 +58,9 @@ public class DialogBox extends HBox {
      * @return a dialog box aligned as the user's message
      */
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+        var db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("user-label");
+        return db;
     }
 
     /**

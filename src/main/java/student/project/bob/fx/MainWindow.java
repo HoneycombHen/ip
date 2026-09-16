@@ -8,11 +8,14 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import student.project.bob.Bob;
+import student.project.bob.personality.PersonalityProfile;
 
 /**
  * Controller for the main GUI.
  */
 public class MainWindow extends AnchorPane {
+    private static final PersonalityProfile PERSONALITY = PersonalityProfile.DEFAULT;
+
     @FXML
     private ScrollPane scrollPane;
 
@@ -27,8 +30,8 @@ public class MainWindow extends AnchorPane {
 
     private Bob bob;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/Orange.jpeg"));
-    private Image bobImage = new Image(this.getClass().getResourceAsStream("/images/Apple.jpeg"));
+    private Image userImage = new Image(this.getClass().getResourceAsStream(PERSONALITY.getUserImagePath()));
+    private Image bobImage = new Image(this.getClass().getResourceAsStream(PERSONALITY.getBotImagePath()));
 
     /**
      * Binds the dialog container's scroll position to its content height.
@@ -45,6 +48,9 @@ public class MainWindow extends AnchorPane {
      */
     public void setBob(Bob bob) {
         this.bob = bob;
+        if (dialogContainer.getChildren().isEmpty()) {
+            dialogContainer.getChildren().add(DialogBox.getBobDialog(PERSONALITY.getWelcomeMessage(), bobImage));
+        }
     }
 
     /**
