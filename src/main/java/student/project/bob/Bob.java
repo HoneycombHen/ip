@@ -16,6 +16,7 @@ import student.project.bob.model.TaskList;
 import student.project.bob.model.UndoHistory;
 import student.project.bob.parser.Command;
 import student.project.bob.parser.Parser;
+import student.project.bob.personality.PersonalityProfile;
 import student.project.bob.storage.Storage;
 import student.project.bob.storage.StorageException;
 import student.project.bob.ui.Ui;
@@ -32,6 +33,7 @@ public class Bob {
     private final Parser parser;
     private final TaskList taskList;
     private final UndoHistory undoHistory;
+    private final PersonalityProfile personality;
 
     /**
      * Creates Bob with tasks loaded from local storage for GUI use.
@@ -49,6 +51,7 @@ public class Bob {
         }
         taskList = loadedTaskList;
         undoHistory = new UndoHistory();
+        personality = PersonalityProfile.DEFAULT;
     }
 
     /**
@@ -138,7 +141,7 @@ public class Bob {
                 undoHistory.record(task::setUndone, "Undid the last command:\n  [ ] " + task.getDescription());
             }
             saveGuiTasks();
-            return "Nice! I've marked this task as done:\n  [X] " + task.getDescription();
+            return personality.formatMarkedTask(task);
         }
 
         boolean wasDone = task.isDone();
@@ -147,7 +150,7 @@ public class Bob {
             undoHistory.record(task::setDone, "Undid the last command:\n  [X] " + task.getDescription());
         }
         saveGuiTasks();
-        return "OK, I've marked this task as not done yet:\n  [ ] " + task.getDescription();
+        return personality.formatUnmarkedTask(task);
     }
 
     /**
@@ -213,8 +216,7 @@ public class Bob {
         Task removedTask = taskList.remove(index);
         undoHistory.record(() -> taskList.add(index, removedTask), "Undid the last command:\n    " + removedTask);
         saveGuiTasks();
-        return "Noted. I've removed this task:\n    " + removedTask + "\nNow you have " + taskList.size()
-                + " tasks in the list.";
+        return personality.formatDeletedTask(removedTask, taskList.size());
     }
 
     /**
@@ -251,7 +253,7 @@ public class Bob {
         taskList.add(task);
         undoHistory.record(() -> taskList.remove(index), "Undid the last command:\n    " + task);
         saveGuiTasks();
-        return "Got it. I've added this task:\n\n" + task + "\nNow you have " + taskList.size() + " tasks in the list.";
+        return personality.formatAddedTask(task, taskList.size());
     }
 
     /**

@@ -1,28 +1,29 @@
 .root {
-    main-color: rgb(237, 255, 242);       /* Create a looked-up color called "main-color" within root. */
+    main-color: #f4c542;
     -fx-background-color: main-color;
-    -fx-background-image: url("../images/background.jpeg"); /* Set image */
+    -fx-background-image: url("../images/btb_background.jpeg");
     -fx-background-size: 400px 100%;
     -fx-background-repeat: repeat stretch;
 }
 
 .text-field {
-    -fx-background-color: #d9ffe2;
+    -fx-background-color: #fff8dc;
     -fx-font: 20px "Arial";
 }
 
 .button {
-    -fx-background-color: mediumspringgreen;
+    -fx-background-color: #1e88e5;
+    -fx-text-fill: white;
     -fx-font: italic bold 16px "Arial";
 }
 
 .button:hover {
-    -fx-background-color:cyan;
+    -fx-background-color: #1565c0;
     -fx-font-size: 18px;
 }
 
 .button:pressed {
-    -fx-background-color:orange;
+    -fx-background-color: #ef6c00;
     -fx-font-size: 20px;
 }
 

@@ -1,6 +1,6 @@
     .label {
-        -fx-background-color: linear-gradient(to bottom right, #00ffbf, #00ddff);
-        -fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;
+        -fx-background-color: #fff8dc;
+        -fx-border-color: #7a4f01;
         -fx-border-width: 2px;
         -fx-background-radius: 1em 1em 0 1em;
         -fx-border-radius: 1em 1em 0 1em;
@@ -19,8 +19,13 @@
 
 
 .reply-label {
+    -fx-background-color: #90caf9;
     -fx-background-radius: 1em 1em 1em 0;
     -fx-border-radius: 1em 1em 1em 0;
+}
+
+.user-label {
+    -fx-background-color: #ffdf70;
 }
 
 /* Paste this below reply-label */
