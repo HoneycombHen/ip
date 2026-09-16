@@ -166,6 +166,16 @@ public class Ui {
     }
 
     /**
+     * Displays the result of undoing the most recent state-changing command.
+     *
+     * @param message explanation of the undone command
+     */
+    public void showUndoResult(String message) {
+        System.out.println(message);
+        showSeparator();
+    }
+
+    /**
      * Displays an input error without terminating the command loop.
      *
      * @param exception input error to explain

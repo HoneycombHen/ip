@@ -17,6 +17,7 @@ public class Command {
         MARK,
         UNMARK,
         DELETE,
+        UNDO,
         TASK
     }
 

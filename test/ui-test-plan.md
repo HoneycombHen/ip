@@ -43,7 +43,7 @@ What can I do for you?
 ____________________________________________________________
 Oops! A todo needs a description. Example: "todo read a book".
 ____________________________________________________________
-Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, find, or bye.
+Oops! I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, overdue, find, undo, or bye.
 ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
@@ -14735,7 +14735,181 @@ ____________________________________________________________
 ```
 
 **Result:** PASS - exit code 0; stderr empty
-**Overall result:** PASS - 21/21 documented UI cases passed
+### UI-022: Undo task creation and ignore queries
+
+**Aim:** Verify that undo removes the most recent added task, ignores an intervening read-only query, and reports when no undo remains.
+
+**Command:**
+```text
+java -cp build/classes/java/main student.project.bob.Bob
+```
+
+**Inputs:**
+```text
+todo buy milk
+list
+undo
+list
+undo
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] buy milk
+Now you have 1 tasks in the list.
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] buy milk
+____________________________________________________________
+Undid the last command:
+    [T][ ] buy milk
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Oops! There is no command to undo.
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-023: Undo completion and deletion changes
+
+**Aim:** Verify that undo restores completion status and restores a deleted task with its original status.
+
+**Command:**
+```text
+java -cp build/classes/java/main student.project.bob.Bob
+```
+
+**Inputs:**
+```text
+todo write report
+mark 1
+undo
+mark 1
+unmark 1
+undo
+delete 1
+undo
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] write report
+Now you have 1 tasks in the list.
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] write report
+____________________________________________________________
+Undid the last command:
+  [ ] write report
+____________________________________________________________
+Nice! I've marked this task as done:
+  [X] write report
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [ ] write report
+____________________________________________________________
+Undid the last command:
+  [X] write report
+____________________________________________________________
+Noted. I've removed this task:
+    [T][X] write report
+Now you have 0 tasks in the list.
+____________________________________________________________
+Undid the last command:
+    [T][X] write report
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][X] write report
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+### UI-024: Reject undo arguments without clearing history
+
+**Aim:** Verify that undo rejects arguments and leaves the valid undo action available.
+
+**Command:**
+```text
+java -cp build/classes/java/main student.project.bob.Bob
+```
+
+**Inputs:**
+```text
+todo keep task
+undo now
+list
+undo
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____        _
+| __ )  ___ | |__
+|  _ \ / _ \| '_ \
+| |_) | (_) | |_) |
+|____/ \___/|_.__/
+
+Hello! I'm Bob.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+
+[T][ ] keep task
+Now you have 1 tasks in the list.
+____________________________________________________________
+Oops! The undo command does not take any arguments. Example: "undo".
+____________________________________________________________
+Here are the tasks in your list:
+
+1.[T][ ] keep task
+____________________________________________________________
+Undid the last command:
+    [T][ ] keep task
+____________________________________________________________
+Here are the tasks in your list:
+
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+**Historical result before Undo:** PASS - 21/21 documented UI cases passed
 
 Session workspace: C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260909-code-quality-rerun4
 
@@ -14778,3 +14952,46 @@ and every process exited with code 0. The saved-file check for UI-006 passed.
 **Overall result:** PASS — all 21 documented UI cases passed.
 
 Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260909-assertions-final`
+
+### Test session: 2026-09-16 09:23:46 +08:00
+
+**Build command:** `gradlew.bat classes` — passed.
+
+**Run command:** `java -cp build/classes/java/main student.project.bob.Bob`
+
+The 24 documented cases were run in order in fresh isolated directories under
+`_temp/ui-session-20260916-092346-undo`. Each case used the exact documented
+input stream and fixture. Actual stdout matched the corresponding expected
+output after removing trailing spaces from each line; stderr was empty and
+every process exited with code 0. The saved-file check for UI-006 passed.
+
+| Test case | Command | Input result | Actual output | Result |
+| --- | --- | --- | --- | --- |
+| UI-001 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-002 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-003 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-004 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-005 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-006 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; saved-file check passed | Matched expected output | PASS |
+| UI-007 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; saved-data fixture passed | Matched expected output | PASS |
+| UI-008 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; missing-file fixture passed | Matched expected output | PASS |
+| UI-009 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; malformed-file fixture passed | Matched expected output | PASS |
+| UI-010 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; save-failure fixture passed | Matched expected output | PASS |
+| UI-011 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-012 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-013 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input; invalid-date fixture passed | Matched expected output | PASS |
+| UI-014 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-015 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-016 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-017 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-018 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-019 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-020 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-021 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-022 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-023 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+| UI-024 | `java -cp build/classes/java/main student.project.bob.Bob` | Exact documented input | Matched expected output | PASS |
+
+**Overall result:** PASS — all 24 documented UI cases passed.
+
+Session workspace: `C:\Users\hendr\Desktop\Hendrick\NUS\CS2103T\ip\_temp\ui-session-20260916-092346-undo`

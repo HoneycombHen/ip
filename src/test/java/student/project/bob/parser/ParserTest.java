@@ -20,7 +20,7 @@ import student.project.bob.model.Todo;
 public class ParserTest {
     private static final String UNKNOWN_COMMAND_MESSAGE =
             "I do not recognise that command. Try todo, deadline, event, list, mark, unmark, delete, upcoming, on, "
-                    + "overdue, find, or bye.";
+                    + "overdue, find, undo, or bye.";
 
     /**
      * Verifies that every supported command prefix is classified correctly.
@@ -47,6 +47,10 @@ public class ParserTest {
                         Command.Type.UNMARK, parser.parseCommand("unmark 1").getType()),
                 () -> assertEquals(
                         Command.Type.DELETE, parser.parseCommand("delete 1").getType()),
+                () -> assertEquals(
+                        Command.Type.UNDO, parser.parseCommand("undo").getType()),
+                () -> assertEquals(
+                        Command.Type.UNDO, parser.parseCommand("undo extra").getType()),
                 () -> assertEquals(
                         Command.Type.TASK, parser.parseCommand("todo read book").getType()),
                 () -> assertEquals(
