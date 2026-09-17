@@ -24,6 +24,7 @@ public class Main extends Application {
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
+            stage.setTitle("Bob the Task Manager");
             stage.setMinHeight(260);
             stage.setMinWidth(360);
             fxmlLoader.<MainWindow>getController().setBob(bob);
