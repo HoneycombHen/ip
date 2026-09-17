@@ -24,8 +24,8 @@ public class Main extends Application {
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
-            stage.setMinHeight(220);
-            stage.setMinWidth(417);
+            stage.setMinHeight(260);
+            stage.setMinWidth(360);
             fxmlLoader.<MainWindow>getController().setBob(bob);
             stage.show();
         } catch (IOException e) {

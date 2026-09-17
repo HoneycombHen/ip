@@ -13,12 +13,15 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 
 /**
  * Represents a dialog box consisting of an ImageView to represent the speaker's face
  * and a label containing text from the speaker.
  */
 public class DialogBox extends HBox {
+    private static final double AVATAR_SIZE = 44;
+
     @FXML
     private Label dialog;
 
@@ -37,6 +40,9 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+        displayPicture.setFitWidth(AVATAR_SIZE);
+        displayPicture.setFitHeight(AVATAR_SIZE);
+        displayPicture.setClip(new Circle(AVATAR_SIZE / 2, AVATAR_SIZE / 2, AVATAR_SIZE / 2));
     }
 
     /**
@@ -73,6 +79,20 @@ public class DialogBox extends HBox {
     public static DialogBox getBobDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.flip();
+        return db;
+    }
+
+    /**
+     * Creates an error dialog box for Bob's response.
+     *
+     * @param text error message
+     * @param img image representing Bob
+     * @return a dialog box styled as an error response
+     */
+    public static DialogBox getErrorDialog(String text, Image img) {
+        var db = new DialogBox(text, img);
+        db.flip();
+        db.dialog.getStyleClass().add("error-label");
         return db;
     }
 }

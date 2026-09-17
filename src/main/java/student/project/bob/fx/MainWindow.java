@@ -14,6 +14,7 @@ import student.project.bob.personality.PersonalityProfile;
  * Controller for the main GUI.
  */
 public class MainWindow extends AnchorPane {
+    private static final String ERROR_PREFIX = "Oops!";
     private static final PersonalityProfile PERSONALITY = PersonalityProfile.DEFAULT;
 
     @FXML
@@ -62,9 +63,10 @@ public class MainWindow extends AnchorPane {
         String input = userInput.getText();
 
         String response = bob.getResponse(input);
-        dialogContainer
-                .getChildren()
-                .addAll(DialogBox.getUserDialog(input, userImage), DialogBox.getBobDialog(response, bobImage));
+        DialogBox responseDialog = response.startsWith(ERROR_PREFIX)
+                ? DialogBox.getErrorDialog(response, bobImage)
+                : DialogBox.getBobDialog(response, bobImage);
+        dialogContainer.getChildren().addAll(DialogBox.getUserDialog(input, userImage), responseDialog);
         userInput.clear();
     }
 }
