@@ -8,11 +8,16 @@
 
 .text-field {
     -fx-background-color: #fff8dc;
+    -fx-background-radius: 0.75em;
+    -fx-border-color: #c7a94b;
+    -fx-border-radius: 0.75em;
     -fx-font: 20px "Arial";
+    -fx-padding: 8px 12px;
 }
 
 .button {
     -fx-background-color: #1e88e5;
+    -fx-background-radius: 0.75em;
     -fx-text-fill: white;
     -fx-font: italic bold 16px "Arial";
 }
@@ -30,6 +35,7 @@
 
 .scroll-pane {
     -fx-background-color: rgba(0,0,0,.5);
+    -fx-background-radius: 0.75em;
 }
 
 .scroll-pane .viewport {
